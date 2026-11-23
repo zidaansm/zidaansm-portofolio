@@ -1,0 +1,235 @@
+import type { Locale } from "@/types/portfolio";
+
+export const LOCALE_COOKIE_NAME = "portfolio-locale";
+
+export function parseLocale(value: string | undefined | null): Locale {
+  return value === "id" ? "id" : "en";
+}
+
+export const dictionary = {
+  en: {
+    nav: {
+      projects: "Projects",
+      capabilities: "Capabilities",
+      experience: "Experience",
+      contact: "Contact",
+      downloadCv: "Download CV",
+      menu: "Menu",
+      close: "Close",
+    },
+    hero: {
+      eyebrow: "PORTFOLIO // FULLSTACK & SYSTEMS",
+      locationLabel: "LOCATION",
+      focusLabel: "PRIMARY FOCUS",
+      focusValue: "Web Systems, Mobile Apps & Power BI",
+      downloadCv: "Download CV",
+      contactMe: "Contact Me",
+      viewWork: "View Projects",
+    },
+    projects: {
+      sectionNumber: "01",
+      sectionLabel: "FEATURED WORK",
+      title: "Selected Engineering Projects",
+      subtitle:
+        "Production-minded systems designed around real operational workflows, clean data modeling, and cross-functional collaboration.",
+      filterAll: "All",
+      readCaseStudy: "Read Case Study",
+      liveDemo: "Live Demo",
+      repository: "GitHub",
+      emptyState: "No published projects match this filter yet.",
+      yearLabel: "YEAR",
+      roleLabel: "ROLE",
+    },
+    caseStudy: {
+      backToProjects: "Back to All Projects",
+      overview: "CASE STUDY",
+      metaYear: "YEAR",
+      metaCategory: "CATEGORY",
+      metaRole: "ROLE",
+      metaStack: "TECH STACK",
+      problemTitle: "01 / Problem & Context",
+      architectureTitle: "02 / System Architecture",
+      challengesTitle: "03 / Challenges & Implementation",
+      impactTitle: "04 / Measurable Impact & Outcome",
+      galleryTitle: "05 / Documentation & Screenshots",
+      clickToZoom: "Click any photo to view full size",
+      closePreview: "Close",
+      previousProject: "Previous Project",
+      nextProject: "Next Project",
+      liveDemo: "Open Live Demo",
+      viewRepo: "View Repository",
+    },
+    capabilities: {
+      sectionNumber: "02",
+      sectionLabel: "CAPABILITIES",
+      title: "Tech Stack & System Matrix",
+      subtitle:
+        "Practical tools and frameworks applied across fullstack web development, mobile interfaces, database design, and analytical reporting.",
+    },
+    experience: {
+      sectionNumber: "03",
+      sectionLabel: "BACKGROUND",
+      title: "Experience & Education",
+      subtitle:
+        "Academic foundation in Information Systems paired with collaborative industry-style training.",
+    },
+    contact: {
+      sectionNumber: "04",
+      sectionLabel: "CONTACT",
+      title: "Let’s Build Reliable Systems Together",
+      subtitle:
+        "Currently open to full-time Fullstack Web Developer, Software Engineer, or Information Systems opportunities. Reach out directly or leave a message.",
+      directChannels: "DIRECT CHANNELS",
+      emailLabel: "EMAIL ADDRESS",
+      copyEmail: "Copy Email",
+      copied: "Copied!",
+      locationLabel: "BASE LOCATION",
+      availabilityLabel: "AVAILABILITY",
+      formTitle: "SEND A DIRECT MESSAGE",
+      nameLabel: "Full Name",
+      namePlaceholder: "Recruiter / Hiring Manager Name",
+      emailInputLabel: "Email Address",
+      emailPlaceholder: "name@company.com",
+      subjectLabel: "Subject",
+      subjectPlaceholder: "Fullstack Developer Opportunity / Interview",
+      messageLabel: "Message",
+      messagePlaceholder:
+        "Share details about the role, team, or project you'd like to discuss...",
+      sendButton: "Send Message",
+      sending: "Sending...",
+      successMessage:
+        "Message received! Thank you for reaching out — I will respond promptly.",
+      errorFallback: "Something went wrong. Please email me directly instead.",
+    },
+    footer: {
+      builtWith: "Engineered with Next.js, TypeScript & Tailwind CSS.",
+      adminLink: "Admin",
+      cvLink: "Printable CV",
+    },
+    cv: {
+      backHome: "Back to Portfolio",
+      printPdf: "Print / Save as PDF",
+      summaryTitle: "PROFILE SUMMARY",
+      projectsTitle: "SELECTED PROJECTS",
+      experienceTitle: "EXPERIENCE & EDUCATION",
+      skillsTitle: "TECHNICAL CAPABILITIES",
+      note: "Tip: Use your browser's Print dialog and select 'Save as PDF' for a clean monochrome ATS-ready copy.",
+    },
+  },
+  id: {
+    nav: {
+      projects: "Proyek",
+      capabilities: "Keahlian",
+      experience: "Pengalaman",
+      contact: "Kontak",
+      downloadCv: "Unduh CV",
+      menu: "Menu",
+      close: "Tutup",
+    },
+    hero: {
+      eyebrow: "PORTOFOLIO // FULLSTACK & SISTEM",
+      locationLabel: "LOKASI",
+      focusLabel: "FOKUS UTAMA",
+      focusValue: "Sistem Web, Aplikasi Mobile & Power BI",
+      downloadCv: "Unduh CV",
+      contactMe: "Hubungi Saya",
+      viewWork: "Lihat Proyek",
+    },
+    projects: {
+      sectionNumber: "01",
+      sectionLabel: "KARYA UNGGULAN",
+      title: "Proyek Pengembangan Terpilih",
+      subtitle:
+        "Sistem terstruktur yang dirancang untuk mendukung proses operasional nyata, pemodelan data yang rapi, dan kolaborasi lintas tim.",
+      filterAll: "Semua",
+      readCaseStudy: "Baca Studi Kasus",
+      liveDemo: "Demo Live",
+      repository: "GitHub",
+      emptyState: "Belum ada proyek yang cocok dengan filter ini.",
+      yearLabel: "TAHUN",
+      roleLabel: "PERAN",
+    },
+    caseStudy: {
+      backToProjects: "Kembali ke Daftar Proyek",
+      overview: "STUDI KASUS",
+      metaYear: "TAHUN",
+      metaCategory: "KATEGORI",
+      metaRole: "PERAN",
+      metaStack: "TECH STACK",
+      problemTitle: "01 / Masalah & Konteks",
+      architectureTitle: "02 / Arsitektur Sistem",
+      challengesTitle: "03 / Tantangan & Implementasi",
+      impactTitle: "04 / Dampak & Hasil",
+      galleryTitle: "05 / Dokumentasi & Tangkapan Layar",
+      clickToZoom: "Klik foto untuk melihat ukuran penuh",
+      closePreview: "Tutup",
+      previousProject: "Proyek Sebelumnya",
+      nextProject: "Proyek Berikutnya",
+      liveDemo: "Buka Demo Live",
+      viewRepo: "Lihat Repositori",
+    },
+    capabilities: {
+      sectionNumber: "02",
+      sectionLabel: "KAPABILITAS",
+      title: "Matriks Teknologi & Sistem",
+      subtitle:
+        "Teknologi dan perangkat yang digunakan dalam pengembangan web fullstack, antarmuka mobile, basis data, hingga pelaporan analitik.",
+    },
+    experience: {
+      sectionNumber: "03",
+      sectionLabel: "LATAR BELAKANG",
+      title: "Pengalaman & Pendidikan",
+      subtitle:
+        "Fondasi akademik Sistem Informasi yang dipadukan dengan program studi independen kolaboratif.",
+    },
+    contact: {
+      sectionNumber: "04",
+      sectionLabel: "KONTAK",
+      title: "Mari Membangun Sistem yang Andal Bersama",
+      subtitle:
+        "Terbuka untuk peluang kerja full-time sebagai Fullstack Web Developer, Software Engineer, maupun peran terkait Sistem Informasi. Silakan hubungi langsung atau kirim pesan.",
+      directChannels: "KANAL LANGSUNG",
+      emailLabel: "ALAMAT EMAIL",
+      copyEmail: "Salin Email",
+      copied: "Tersalin!",
+      locationLabel: "DOMISILI",
+      availabilityLabel: "KETERSEDIAAN",
+      formTitle: "KIRIM PESAN LANGSUNG",
+      nameLabel: "Nama Lengkap",
+      namePlaceholder: "Nama Recruiter / Hiring Manager",
+      emailInputLabel: "Alamat Email",
+      emailPlaceholder: "nama@perusahaan.com",
+      subjectLabel: "Subjek",
+      subjectPlaceholder: "Peluang Fullstack Developer / Undangan Interview",
+      messageLabel: "Pesan",
+      messagePlaceholder:
+        "Tuliskan informasi singkat mengenai posisi, tim, atau kebutuhan proyek...",
+      sendButton: "Kirim Pesan",
+      sending: "Mengirim...",
+      successMessage:
+        "Pesan berhasil terkirim! Terima kasih sudah menghubungi — saya akan segera membalas.",
+      errorFallback:
+        "Terjadi kendala saat mengirim pesan. Silakan hubungi via email langsung.",
+    },
+    footer: {
+      builtWith: "Dibangun dengan Next.js, TypeScript & Tailwind CSS.",
+      adminLink: "Admin",
+      cvLink: "CV Cetak",
+    },
+    cv: {
+      backHome: "Kembali ke Portofolio",
+      printPdf: "Cetak / Simpan sebagai PDF",
+      summaryTitle: "RINGKASAN PROFIL",
+      projectsTitle: "PROYEK TERPILIH",
+      experienceTitle: "PENGALAMAN & PENDIDIKAN",
+      skillsTitle: "KEAHLIAN TEKNIS",
+      note: "Tips: Gunakan dialog Print browser lalu pilih 'Save as PDF' untuk versi PDF monokrom yang rapi dan ramah ATS.",
+    },
+  },
+} as const;
+
+type DeepString<T> = {
+  readonly [K in keyof T]: T[K] extends string ? string : DeepString<T[K]>;
+};
+
+export type Dictionary = DeepString<(typeof dictionary)["en"]>;
