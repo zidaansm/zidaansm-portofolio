@@ -9,11 +9,11 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 import type { GitHubShowcaseData } from "@/types/portfolio";
 
 const levelClasses: Record<0 | 1 | 2 | 3 | 4, string> = {
-  0: "bg-canvas border border-borderline/20",
-  1: "bg-ink/20 border border-borderline/30",
-  2: "bg-ink/45 border border-borderline/45",
-  3: "bg-ink/75 border border-borderline/70",
-  4: "bg-ink border border-borderline",
+  0: "bg-zinc-100 border border-zinc-200 dark:bg-zinc-900 dark:border-zinc-800",
+  1: "bg-zinc-300 border border-zinc-400 dark:bg-zinc-700 dark:border-zinc-600",
+  2: "bg-zinc-500 border border-zinc-600 dark:bg-zinc-500 dark:border-zinc-400",
+  3: "bg-zinc-700 border border-zinc-800 dark:bg-zinc-300 dark:border-zinc-200",
+  4: "bg-zinc-950 border border-zinc-950 dark:bg-white dark:border-white",
 };
 
 const MONTH_SHORT = [

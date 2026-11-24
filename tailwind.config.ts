@@ -15,11 +15,11 @@ const config: Config = {
         mono: ["var(--font-mono)", "monospace"],
       },
       colors: {
-        canvas: "var(--bg)",
-        surface: "var(--surface)",
-        ink: "var(--fg)",
-        muted: "var(--muted)",
-        borderline: "var(--border)",
+        canvas: "rgb(var(--bg-rgb) / <alpha-value>)",
+        surface: "rgb(var(--surface-rgb) / <alpha-value>)",
+        ink: "rgb(var(--fg-rgb) / <alpha-value>)",
+        muted: "rgb(var(--muted-rgb) / <alpha-value>)",
+        borderline: "rgb(var(--border-rgb) / <alpha-value>)",
       },
       boxShadow: {
         brutal: "4px 4px 0px 0px var(--brutal-shadow)",

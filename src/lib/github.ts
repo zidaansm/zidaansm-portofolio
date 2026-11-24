@@ -65,6 +65,17 @@ function mapContributionLevel(level: string): 0 | 1 | 2 | 3 | 4 {
   }
 }
 
+function computeContributionLevel(
+  count: number,
+  githubLevel: string
+): 0 | 1 | 2 | 3 | 4 {
+  if (count <= 0) return 0;
+  const countLevel: 1 | 2 | 3 | 4 =
+    count >= 15 ? 4 : count >= 7 ? 3 : count >= 3 ? 2 : 1;
+  const apiLevel = mapContributionLevel(githubLevel);
+  return Math.max(countLevel, apiLevel) as 0 | 1 | 2 | 3 | 4;
+}
+
 async function fetchGitHubContributions(
   username: string,
   token: string
@@ -117,11 +128,14 @@ async function fetchGitHubContributions(
       totalContributions: calendar.totalContributions ?? 0,
       weeks: calendar.weeks.map((week) => ({
         days: (week.contributionDays ?? []).map(
-          (day): GitHubContributionDay => ({
-            date: day.date,
-            count: day.contributionCount ?? 0,
-            level: mapContributionLevel(day.contributionLevel),
-          })
+          (day): GitHubContributionDay => {
+            const count = day.contributionCount ?? 0;
+            return {
+              date: day.date,
+              count,
+              level: computeContributionLevel(count, day.contributionLevel),
+            };
+          }
         ),
       })),
     };
