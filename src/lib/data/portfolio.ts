@@ -1,3 +1,4 @@
+import { cache } from "react";
 import {
   FALLBACK_CAPABILITIES,
   FALLBACK_EXPERIENCES,
@@ -22,7 +23,7 @@ import type {
   TechCapability,
 } from "@/types/portfolio";
 
-export async function getPortfolioData(): Promise<PortfolioData> {
+export const getPortfolioData = cache(async (): Promise<PortfolioData> => {
   if (!isSupabaseConfigured()) {
     return FALLBACK_PORTFOLIO_DATA;
   }
@@ -79,13 +80,14 @@ export async function getPortfolioData(): Promise<PortfolioData> {
   } catch {
     return FALLBACK_PORTFOLIO_DATA;
   }
-}
+});
 
 export async function getPublishedProjectBySlug(slug: string): Promise<{
   project: Project | null;
   prevProject: Project | null;
   nextProject: Project | null;
   profile: Profile;
+  hasExperiences: boolean;
 }> {
   const data = await getPortfolioData();
   const index = data.projects.findIndex((p) => p.slug === slug);
@@ -96,6 +98,7 @@ export async function getPublishedProjectBySlug(slug: string): Promise<{
       prevProject: null,
       nextProject: null,
       profile: data.profile,
+      hasExperiences: data.experiences.length > 0,
     };
   }
 
@@ -104,6 +107,7 @@ export async function getPublishedProjectBySlug(slug: string): Promise<{
     prevProject: index > 0 ? data.projects[index - 1] : null,
     nextProject: index < data.projects.length - 1 ? data.projects[index + 1] : null,
     profile: data.profile,
+    hasExperiences: data.experiences.length > 0,
   };
 }
 

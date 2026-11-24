@@ -1,8 +1,10 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { JetBrains_Mono, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import { cookies } from "next/headers";
 import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { NavigationProgressBar } from "@/components/ui/NavigationProgressBar";
 import { LOCALE_COOKIE_NAME, parseLocale } from "@/lib/i18n";
 import "./globals.css";
 
@@ -80,6 +82,9 @@ export default async function RootLayout({
       >
         <ThemeProvider>
           <LanguageProvider initialLocale={initialLocale}>
+            <Suspense fallback={null}>
+              <NavigationProgressBar />
+            </Suspense>
             {children}
           </LanguageProvider>
         </ThemeProvider>
