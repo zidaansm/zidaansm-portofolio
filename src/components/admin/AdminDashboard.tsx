@@ -8,12 +8,14 @@ import {
   ArrowDown,
   ArrowLeft,
   ArrowUp,
+  BarChart3,
   Check,
   Database,
   ImagePlus,
   LogOut,
   Mail,
   Plus,
+  RefreshCw,
   Save,
   Trash2,
 } from "lucide-react";
@@ -22,6 +24,7 @@ import { BrutalButton } from "@/components/ui/BrutalButton";
 import { BrutalCard } from "@/components/ui/BrutalCard";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type {
+  AnalyticsSummary,
   ContactMessage,
   Experience,
   Profile,
@@ -30,7 +33,13 @@ import type {
   TechCapability,
 } from "@/types/portfolio";
 
-type TabKey = "profile" | "projects" | "capabilities" | "experience" | "messages";
+type TabKey =
+  | "profile"
+  | "projects"
+  | "capabilities"
+  | "experience"
+  | "messages"
+  | "analytics";
 
 interface AdminDashboardProps {
   initialProfile: Profile;
@@ -38,6 +47,7 @@ interface AdminDashboardProps {
   initialCapabilities: TechCapability[];
   initialExperiences: Experience[];
   initialMessages: ContactMessage[];
+  initialAnalytics: AnalyticsSummary;
   schemaReady: boolean;
   userEmail: string;
 }
@@ -111,6 +121,7 @@ export function AdminDashboard({
   initialCapabilities,
   initialExperiences,
   initialMessages,
+  initialAnalytics,
   schemaReady,
   userEmail,
 }: AdminDashboardProps) {
@@ -134,6 +145,8 @@ export function AdminDashboard({
   const [experiences, setExperiences] =
     useState<Experience[]>(initialExperiences);
   const [messages, setMessages] = useState<ContactMessage[]>(initialMessages);
+  const [analytics, setAnalytics] =
+    useState<AnalyticsSummary>(initialAnalytics);
 
   // Project editor state
   const [editingProjectId, setEditingProjectId] = useState<string | "new" | null>(
@@ -709,6 +722,52 @@ export function AdminDashboard({
     }
   }
 
+  // ---------------- ANALYTICS ----------------
+  async function handleRefreshAnalytics() {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/analytics");
+      const json = (await res.json()) as {
+        analytics?: AnalyticsSummary;
+        error?: string;
+      };
+      if (!res.ok || !json.analytics) {
+        notify("err", json.error || "Failed to refresh analytics.");
+      } else {
+        setAnalytics(json.analytics);
+        notify("ok", "Analytics refreshed.");
+      }
+    } catch {
+      notify("err", "Network error refreshing analytics.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResetAnalytics() {
+    if (!confirm("Reset all recorded analytics events? This cannot be undone.")) {
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/analytics", { method: "DELETE" });
+      const json = (await res.json()) as {
+        analytics?: AnalyticsSummary;
+        error?: string;
+      };
+      if (!res.ok || !json.analytics) {
+        notify("err", json.error || "Failed to reset analytics.");
+      } else {
+        setAnalytics(json.analytics);
+        notify("ok", "Analytics data cleared.");
+      }
+    } catch {
+      notify("err", "Network error resetting analytics.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const tabs: { key: TabKey; label: string }[] = [
     { key: "projects", label: `Projects (${projects.length})` },
     { key: "profile", label: "Profile & CV" },
@@ -717,6 +776,10 @@ export function AdminDashboard({
     {
       key: "messages",
       label: unreadCount > 0 ? `Inbox (${unreadCount} new)` : `Inbox (${messages.length})`,
+    },
+    {
+      key: "analytics",
+      label: `Analytics (${analytics.totalPageViews + analytics.totalProjectViews})`,
     },
   ];
 
@@ -2171,6 +2234,257 @@ export function AdminDashboard({
                   </div>
                 </BrutalCard>
               ))
+            )}
+          </div>
+        )}
+
+        {/* TAB: ANALYTICS */}
+        {activeTab === "analytics" && (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="font-display text-xl font-bold">
+                  Portfolio Analytics
+                </h2>
+                <p className="font-mono text-xs text-muted">
+                  First-party visitor metrics stored in Supabase (no third-party cookies).
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <BrutalButton
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy}
+                  onClick={handleRefreshAnalytics}
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  <span>Refresh</span>
+                </BrutalButton>
+                {analytics.tableReady && (
+                  <BrutalButton
+                    variant="ghost"
+                    size="sm"
+                    disabled={busy}
+                    onClick={handleResetAnalytics}
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>Reset</span>
+                  </BrutalButton>
+                )}
+              </div>
+            </div>
+
+            {!analytics.tableReady ? (
+              <BrutalCard className="p-6 font-mono text-xs">
+                <div className="flex items-center gap-2 font-bold uppercase text-ink">
+                  <AlertTriangle className="h-4 w-4 shrink-0" />
+                  <span>Analytics Table Setup Needed</span>
+                </div>
+                <p className="mt-2 leading-relaxed text-muted">
+                  Run the <code>analytics_events</code> section from{" "}
+                  <code>supabase/schema.sql</code> in Supabase SQL Editor, then click
+                  Refresh above to start recording page views, case study opens,
+                  and CV downloads.
+                </p>
+              </BrutalCard>
+            ) : (
+              <>
+                {/* 4 KPI Cards */}
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    {
+                      label: "TOTAL PAGE VIEWS",
+                      value: analytics.totalPageViews,
+                      note: "Landing page visits",
+                    },
+                    {
+                      label: "CASE STUDY VIEWS",
+                      value: analytics.totalProjectViews,
+                      note: "Project detail opens",
+                    },
+                    {
+                      label: "CV DOWNLOADS",
+                      value: analytics.totalCvDownloads,
+                      note: "Button & PDF print clicks",
+                    },
+                    {
+                      label: "LAST 7 DAYS",
+                      value: analytics.viewsLast7Days,
+                      note: "Combined views (7d)",
+                    },
+                  ].map((kpi) => (
+                    <BrutalCard key={kpi.label} className="p-5">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">
+                          {kpi.label}
+                        </span>
+                        <BarChart3 className="h-4 w-4 text-muted" />
+                      </div>
+                      <p className="font-display text-3xl font-bold text-ink">
+                        {kpi.value}
+                      </p>
+                      <p className="mt-1 font-mono text-[11px] text-muted">
+                        {kpi.note}
+                      </p>
+                    </BrutalCard>
+                  ))}
+                </div>
+
+                {/* 14-Day Traffic Bar Chart */}
+                <BrutalCard className="p-6">
+                  <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3">
+                    <h3 className="font-display text-lg font-bold text-ink">
+                      14-Day Activity Trend
+                    </h3>
+                    <div className="flex items-center gap-4 font-mono text-[11px] uppercase text-muted">
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-block h-2.5 w-2.5 bg-ink" />
+                        Views
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <span className="inline-block h-2.5 w-2.5 border border-borderline bg-canvas" />
+                        CV Clicks
+                      </span>
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const maxDaily = Math.max(
+                      1,
+                      ...analytics.dailyTrend.map((d) => d.views + d.cvDownloads)
+                    );
+                    return (
+                      <div className="grid grid-cols-7 gap-2 sm:grid-cols-[repeat(14,minmax(0,1fr))]">
+                        {analytics.dailyTrend.map((day) => {
+                          const total = day.views + day.cvDownloads;
+                          const heightPct = Math.max(
+                            total > 0 ? 12 : 4,
+                            Math.round((total / maxDaily) * 100)
+                          );
+                          return (
+                            <div
+                              key={day.date}
+                              title={`${day.date}: ${day.views} views, ${day.cvDownloads} CV clicks`}
+                              className="flex flex-col items-center gap-1.5"
+                            >
+                              <span className="font-mono text-[10px] font-bold text-muted">
+                                {total > 0 ? total : "·"}
+                              </span>
+                              <div className="flex h-28 w-full items-end border border-borderline/30 bg-canvas p-1">
+                                <div
+                                  style={{ height: `${heightPct}%` }}
+                                  className={`w-full transition-all ${
+                                    total > 0 ? "bg-ink" : "bg-borderline/20"
+                                  }`}
+                                />
+                              </div>
+                              <span className="font-mono text-[9px] text-muted">
+                                {day.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </BrutalCard>
+
+                {/* Breakdowns */}
+                <div className="grid gap-6 md:grid-cols-2">
+                  {/* Top Viewed Projects */}
+                  <BrutalCard className="p-6">
+                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-lg font-bold">
+                      Top Viewed Projects
+                    </h3>
+                    {analytics.topProjects.length === 0 ? (
+                      <p className="font-mono text-xs text-muted">
+                        No project case study views recorded yet.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {(() => {
+                          const maxProj = Math.max(
+                            1,
+                            analytics.topProjects[0]?.views ?? 1
+                          );
+                          return analytics.topProjects.map((item) => (
+                            <div key={item.slug} className="space-y-1">
+                              <div className="flex items-center justify-between font-mono text-xs">
+                                <span className="font-bold text-ink truncate pr-2">
+                                  {item.title}
+                                </span>
+                                <span className="text-muted shrink-0">
+                                  {item.views} views
+                                </span>
+                              </div>
+                              <div className="h-2.5 w-full border border-borderline bg-canvas">
+                                <div
+                                  style={{
+                                    width: `${Math.round((item.views / maxProj) * 100)}%`,
+                                  }}
+                                  className="h-full bg-ink"
+                                />
+                              </div>
+                            </div>
+                          ));
+                        })()}
+                      </div>
+                    )}
+                  </BrutalCard>
+
+                  {/* Referrers & Devices */}
+                  <BrutalCard className="p-6">
+                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-lg font-bold">
+                      Referrers &amp; Devices
+                    </h3>
+
+                    <div className="mb-5 grid grid-cols-3 gap-2">
+                      {(
+                        [
+                          ["Desktop", analytics.deviceBreakdown.desktop],
+                          ["Mobile", analytics.deviceBreakdown.mobile],
+                          ["Tablet", analytics.deviceBreakdown.tablet],
+                        ] as const
+                      ).map(([label, count]) => (
+                        <div
+                          key={label}
+                          className="border-2 border-borderline bg-canvas p-3 text-center"
+                        >
+                          <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                            {label}
+                          </p>
+                          <p className="mt-1 font-display text-xl font-bold text-ink">
+                            {count}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <p className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-muted">
+                      TOP REFERRERS
+                    </p>
+                    {analytics.topReferrers.length === 0 ? (
+                      <p className="font-mono text-xs text-muted">
+                        No referrer data recorded yet.
+                      </p>
+                    ) : (
+                      <ul className="space-y-1.5 font-mono text-xs">
+                        {analytics.topReferrers.map((ref) => (
+                          <li
+                            key={ref.host}
+                            className="flex items-center justify-between border-b border-borderline/20 pb-1"
+                          >
+                            <span className="text-ink">{ref.host}</span>
+                            <span className="font-bold text-muted">
+                              {ref.count}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </BrutalCard>
+                </div>
+              </>
             )}
           </div>
         )}

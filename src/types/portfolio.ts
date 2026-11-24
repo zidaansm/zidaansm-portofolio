@@ -104,3 +104,68 @@ export interface PortfolioData {
   experiences: Experience[];
   source: "supabase" | "fallback";
 }
+
+export type AnalyticsEventType = "page_view" | "project_view" | "cv_download";
+
+export interface AnalyticsEventRow {
+  id: string;
+  event_type: AnalyticsEventType;
+  path: string;
+  project_slug: string | null;
+  referrer_host: string;
+  device_type: string;
+  created_at: string;
+}
+
+export interface AnalyticsDailyPoint {
+  date: string;
+  label: string;
+  views: number;
+  cvDownloads: number;
+}
+
+export interface AnalyticsSummary {
+  tableReady: boolean;
+  totalPageViews: number;
+  totalProjectViews: number;
+  totalCvDownloads: number;
+  viewsLast7Days: number;
+  dailyTrend: AnalyticsDailyPoint[];
+  topProjects: { slug: string; title: string; views: number }[];
+  topReferrers: { host: string; count: number }[];
+  deviceBreakdown: { desktop: number; mobile: number; tablet: number };
+}
+
+export interface GitHubRepo {
+  id: number;
+  name: string;
+  description: string | null;
+  htmlUrl: string;
+  homepage: string | null;
+  language: string | null;
+  stars: number;
+  forks: number;
+  pushedAt: string;
+}
+
+export interface GitHubContributionDay {
+  date: string;
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
+}
+
+export interface GitHubContributionCalendar {
+  totalContributions: number;
+  weeks: { days: GitHubContributionDay[] }[];
+}
+
+export interface GitHubShowcaseData {
+  username: string;
+  profileUrl: string;
+  publicRepos: number;
+  followers: number;
+  totalStars: number;
+  topLanguages: { name: string; count: number }[];
+  repos: GitHubRepo[];
+  contributions: GitHubContributionCalendar | null;
+}

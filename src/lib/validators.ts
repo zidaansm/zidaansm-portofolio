@@ -139,3 +139,17 @@ export const messagePatchSchema = z.object({
   id: z.string().uuid(),
   is_read: z.boolean(),
 });
+
+export const analyticsEventSchema = z.object({
+  event_type: z.enum(["page_view", "project_view", "cv_download"]),
+  path: z
+    .string()
+    .trim()
+    .min(1)
+    .max(200)
+    .refine((val) => val.startsWith("/"), {
+      message: "Path must start with /",
+    }),
+  project_slug: z.string().trim().max(120).optional().nullable(),
+  referrer: z.string().trim().max(500).optional().nullable(),
+});

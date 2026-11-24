@@ -293,3 +293,44 @@ create policy "Admin can delete portfolio media"
     bucket_id = 'portfolio-media'
     and auth.jwt() ->> 'email' = 'zidanseftino18@gmail.com'
   );
+
+-- ============================================================================
+-- 6. Lightweight First-Party Portfolio Analytics
+-- ============================================================================
+create table if not exists public.analytics_events (
+  id uuid primary key default gen_random_uuid(),
+  event_type text not null check (event_type in ('page_view', 'project_view', 'cv_download')),
+  path text not null,
+  project_slug text,
+  referrer_host text not null default 'direct',
+  device_type text not null default 'desktop',
+  created_at timestamptz not null default timezone('utc'::text, now())
+);
+
+create index if not exists idx_analytics_events_created
+  on public.analytics_events (created_at desc);
+
+create index if not exists idx_analytics_events_type_slug
+  on public.analytics_events (event_type, project_slug);
+
+alter table public.analytics_events enable row level security;
+
+drop policy if exists "Anyone can insert analytics event" on public.analytics_events;
+create policy "Anyone can insert analytics event"
+  on public.analytics_events for insert
+  with check (event_type in ('page_view', 'project_view', 'cv_download'));
+
+drop policy if exists "Admin can read analytics events" on public.analytics_events;
+create policy "Admin can read analytics events"
+  on public.analytics_events for select
+  using (auth.jwt() ->> 'email' = 'zidanseftino18@gmail.com');
+
+drop policy if exists "Admin can delete analytics events" on public.analytics_events;
+create policy "Admin can delete analytics events"
+  on public.analytics_events for delete
+  using (auth.jwt() ->> 'email' = 'zidanseftino18@gmail.com');
+
+grant insert on public.analytics_events to anon, authenticated;
+grant select, delete on public.analytics_events to authenticated;
+
+notify pgrst, 'reload schema';

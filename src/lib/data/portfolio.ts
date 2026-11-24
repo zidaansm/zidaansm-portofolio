@@ -5,9 +5,15 @@ import {
   FALLBACK_PROFILE,
   FALLBACK_PROJECTS,
 } from "@/data/seed-data";
+import {
+  createEmptyAnalyticsSummary,
+  summarizeAnalyticsEvents,
+} from "@/lib/analytics-server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
+  AnalyticsEventRow,
+  AnalyticsSummary,
   ContactMessage,
   Experience,
   PortfolioData,
@@ -107,6 +113,7 @@ export async function getAdminPortfolioData(): Promise<{
   capabilities: TechCapability[];
   experiences: Experience[];
   messages: ContactMessage[];
+  analytics: AnalyticsSummary;
   schemaReady: boolean;
 }> {
   const supabase = await createServerSupabaseClient();
@@ -117,31 +124,43 @@ export async function getAdminPortfolioData(): Promise<{
       capabilities: FALLBACK_CAPABILITIES,
       experiences: FALLBACK_EXPERIENCES,
       messages: [],
+      analytics: createEmptyAnalyticsSummary(false),
       schemaReady: false,
     };
   }
 
-  const [profileRes, projectsRes, capabilitiesRes, experiencesRes, messagesRes] =
-    await Promise.all([
-      supabase.from("profile").select("*").limit(1).maybeSingle(),
-      supabase
-        .from("projects")
-        .select("*")
-        .order("sort_order", { ascending: true })
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("tech_capabilities")
-        .select("*")
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("experiences")
-        .select("*")
-        .order("sort_order", { ascending: true }),
-      supabase
-        .from("contact_messages")
-        .select("*")
-        .order("created_at", { ascending: false }),
-    ]);
+  const [
+    profileRes,
+    projectsRes,
+    capabilitiesRes,
+    experiencesRes,
+    messagesRes,
+    analyticsRes,
+  ] = await Promise.all([
+    supabase.from("profile").select("*").limit(1).maybeSingle(),
+    supabase
+      .from("projects")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("tech_capabilities")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("experiences")
+      .select("*")
+      .order("sort_order", { ascending: true }),
+    supabase
+      .from("contact_messages")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("analytics_events")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5000),
+  ]);
 
   const schemaReady =
     !profileRes.error &&
@@ -150,12 +169,22 @@ export async function getAdminPortfolioData(): Promise<{
     !experiencesRes.error &&
     !messagesRes.error;
 
+  const projects = (projectsRes.data as Project[] | null) ?? [];
+  const analytics = analyticsRes.error
+    ? createEmptyAnalyticsSummary(false)
+    : summarizeAnalyticsEvents(
+        (analyticsRes.data as AnalyticsEventRow[] | null) ?? [],
+        projects,
+        true
+      );
+
   return {
     profile: (profileRes.data as Profile | null) ?? FALLBACK_PROFILE,
-    projects: (projectsRes.data as Project[] | null) ?? [],
+    projects,
     capabilities: (capabilitiesRes.data as TechCapability[] | null) ?? [],
     experiences: (experiencesRes.data as Experience[] | null) ?? [],
     messages: (messagesRes.data as ContactMessage[] | null) ?? [],
+    analytics,
     schemaReady,
   };
 }

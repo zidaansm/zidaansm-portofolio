@@ -6,6 +6,7 @@ import { useTheme } from "next-themes";
 import { Download, Menu, Moon, Sun, X } from "lucide-react";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { BrutalLinkButton } from "@/components/ui/BrutalButton";
+import { trackPortfolioEvent } from "@/lib/analytics";
 import { isExternalUrl } from "@/lib/utils";
 import type { Profile } from "@/types/portfolio";
 
@@ -123,6 +124,12 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
             external={isExternalUrl(profile.cv_url)}
             size="sm"
             className="hidden sm:inline-flex"
+            onClick={() =>
+              trackPortfolioEvent({
+                event_type: "cv_download",
+                path: profile.cv_url || "/cv",
+              })
+            }
           >
             <Download className="h-3.5 w-3.5" />
             <span>{t.nav.downloadCv}</span>
@@ -160,7 +167,13 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
               external={isExternalUrl(profile.cv_url)}
               size="md"
               className="mt-2 w-full"
-              onClick={() => setMobileOpen(false)}
+              onClick={() => {
+                setMobileOpen(false);
+                trackPortfolioEvent({
+                  event_type: "cv_download",
+                  path: profile.cv_url || "/cv",
+                });
+              }}
             >
               <Download className="h-4 w-4" />
               <span>{t.nav.downloadCv}</span>

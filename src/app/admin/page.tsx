@@ -39,6 +39,7 @@ export default async function AdminPage() {
       initialCapabilities={data.capabilities}
       initialExperiences={data.experiences}
       initialMessages={data.messages}
+      initialAnalytics={data.analytics}
       schemaReady={data.schemaReady}
       userEmail={user.email ?? ""}
     />

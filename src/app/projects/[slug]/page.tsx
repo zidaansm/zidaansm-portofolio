@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ProjectCaseStudyView } from "@/components/projects/ProjectCaseStudyView";
@@ -40,6 +41,11 @@ export default async function ProjectDetailPage({
 
   return (
     <div className="flex min-h-screen flex-col">
+      <AnalyticsTracker
+        eventType="project_view"
+        path={`/projects/${project.slug}`}
+        projectSlug={project.slug}
+      />
       <Navbar
         profile={profile}
         hasExperiences={fullData.experiences.length > 0}

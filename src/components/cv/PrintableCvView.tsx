@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, Printer } from "lucide-react";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { BrutalButton } from "@/components/ui/BrutalButton";
+import { trackPortfolioEvent } from "@/lib/analytics";
 import type { PortfolioData } from "@/types/portfolio";
 
 export function PrintableCvView({ data }: { data: PortfolioData }) {
@@ -27,7 +28,17 @@ export function PrintableCvView({ data }: { data: PortfolioData }) {
           </Link>
 
           <div className="flex items-center gap-3">
-            <BrutalButton type="button" size="sm" onClick={() => window.print()}>
+            <BrutalButton
+              type="button"
+              size="sm"
+              onClick={() => {
+                trackPortfolioEvent({
+                  event_type: "cv_download",
+                  path: "/cv#print",
+                });
+                window.print();
+              }}
+            >
               <Printer className="h-4 w-4" />
               <span>{t.cv.printPdf}</span>
             </BrutalButton>

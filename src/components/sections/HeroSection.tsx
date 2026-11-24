@@ -6,6 +6,7 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import { Badge } from "@/components/ui/Badge";
 import { BrutalLinkButton } from "@/components/ui/BrutalButton";
 import { BrutalCard } from "@/components/ui/BrutalCard";
+import { trackPortfolioEvent } from "@/lib/analytics";
 import { isExternalUrl } from "@/lib/utils";
 import type { Profile } from "@/types/portfolio";
 
@@ -68,6 +69,12 @@ export function HeroSection({ profile }: { profile: Profile }) {
                 external={isExternalUrl(profile.cv_url)}
                 size="lg"
                 variant="primary"
+                onClick={() =>
+                  trackPortfolioEvent({
+                    event_type: "cv_download",
+                    path: profile.cv_url || "/cv",
+                  })
+                }
               >
                 <Download className="h-4 w-4" />
                 <span>{t.hero.downloadCv}</span>

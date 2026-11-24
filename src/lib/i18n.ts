@@ -73,8 +73,29 @@ export const dictionary = {
       subtitle:
         "Academic foundation in Information Systems paired with collaborative industry-style training.",
     },
-    contact: {
+    github: {
       sectionNumber: "04",
+      sectionLabel: "OPEN SOURCE & ACTIVITY",
+      title: "Live GitHub Showcase",
+      subtitle:
+        "Recent public repositories and language activity synced directly from GitHub.",
+      handleLabel: "GITHUB HANDLE",
+      reposLabel: "PUBLIC REPOS",
+      starsLabel: "RECENT STARS",
+      languagesLabel: "PRIMARY LANGUAGES",
+      updatedLabel: "Updated",
+      noDescription: "Repository code & technical implementation.",
+      viewProfile: "View Full GitHub Profile",
+      viewRepo: "Repository",
+      liveBadge: "Live",
+      contributionsTitle: "Contribution Activity (Last 12 Months)",
+      totalContributions: "contributions in the last year",
+      less: "Less",
+      more: "More",
+      contributionUnit: "contributions",
+    },
+    contact: {
+      sectionNumber: "05",
       sectionLabel: "CONTACT",
       title: "Let’s Build Reliable Systems Together",
       subtitle:
@@ -182,8 +203,29 @@ export const dictionary = {
       subtitle:
         "Fondasi akademik Sistem Informasi yang dipadukan dengan program studi independen kolaboratif.",
     },
-    contact: {
+    github: {
       sectionNumber: "04",
+      sectionLabel: "OPEN SOURCE & AKTIVITAS",
+      title: "Showcase GitHub Live",
+      subtitle:
+        "Repositori publik terbaru dan distribusi bahasa pemrograman yang tersinkronisasi langsung dari GitHub.",
+      handleLabel: "AKUN GITHUB",
+      reposLabel: "REPOSITORI PUBLIK",
+      starsLabel: "TOTAL STAR",
+      languagesLabel: "BAHASA UTAMA",
+      updatedLabel: "Diperbarui",
+      noDescription: "Kode repositori dan implementasi teknis.",
+      viewProfile: "Lihat Profil GitHub Lengkap",
+      viewRepo: "Repositori",
+      liveBadge: "Live",
+      contributionsTitle: "Aktivitas Kontribusi (12 Bulan Terakhir)",
+      totalContributions: "kontribusi dalam setahun terakhir",
+      less: "Sedikit",
+      more: "Banyak",
+      contributionUnit: "kontribusi",
+    },
+    contact: {
+      sectionNumber: "05",
       sectionLabel: "KONTAK",
       title: "Mari Membangun Sistem yang Andal Bersama",
       subtitle:
