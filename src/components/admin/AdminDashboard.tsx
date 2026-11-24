@@ -841,39 +841,44 @@ export function AdminDashboard({
   ];
 
   return (
-    <div className="min-h-screen bg-canvas py-8">
+    <div className="min-h-screen bg-canvas py-5 sm:py-8">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         {/* Top Bar */}
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-4 border-b-2 border-borderline pb-6">
-          <div>
+        <div className="mb-6 flex flex-col items-start justify-between gap-4 border-b-2 border-borderline pb-5 sm:mb-8 sm:flex-row sm:items-center sm:pb-6">
+          <div className="min-w-0 w-full sm:w-auto">
             <Link
               href="/"
-              className="mb-2 inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted hover:text-ink"
+              className="mb-2 inline-flex min-h-[36px] items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted hover:text-ink"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               <span>View Live Portfolio</span>
             </Link>
-            <h1 className="font-display text-3xl font-bold text-ink">
+            <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">
               Portfolio Admin CMS
             </h1>
-            <p className="font-mono text-xs text-muted">
+            <p className="mt-0.5 break-all font-mono text-xs text-muted">
               Signed in as {userEmail}
             </p>
           </div>
 
-          <BrutalButton variant="secondary" size="sm" onClick={handleSignOut}>
+          <BrutalButton
+            variant="secondary"
+            size="sm"
+            onClick={handleSignOut}
+            className="w-full sm:w-auto shrink-0"
+          >
             <LogOut className="h-4 w-4" />
             <span>Sign Out</span>
           </BrutalButton>
         </div>
 
         {!schemaReady && (
-          <BrutalCard className="mb-6 border-2 p-4 font-mono text-xs">
+          <BrutalCard className="mb-6 w-full min-w-0 border-2 p-4 font-mono text-xs">
             <div className="flex items-center gap-2 font-bold uppercase">
               <AlertTriangle className="h-4 w-4 shrink-0" />
               <span>Supabase Schema / Seed Pending</span>
             </div>
-            <p className="mt-1 text-muted">
+            <p className="mt-1 break-words text-muted">
               Some database tables were not found yet. Run{" "}
               <code>supabase/schema.sql</code> and <code>supabase/seed.sql</code>{" "}
               in your Supabase SQL Editor before editing live records.
@@ -885,8 +890,8 @@ export function AdminDashboard({
           (projects.length === 0 ||
             capabilities.length === 0 ||
             experiences.length === 0) && (
-            <BrutalCard className="mb-6 flex flex-wrap items-center justify-between gap-4 p-4">
-              <div className="font-mono text-xs">
+            <BrutalCard className="mb-6 flex w-full min-w-0 flex-col items-stretch justify-between gap-4 p-4 sm:flex-row sm:items-center">
+              <div className="min-w-0 font-mono text-xs">
                 <p className="font-bold uppercase text-ink">
                   Database Tables Are Partially Empty
                 </p>
@@ -901,6 +906,7 @@ export function AdminDashboard({
                 size="sm"
                 disabled={busy}
                 onClick={handleSeedInitialData}
+                className="w-full shrink-0 sm:w-auto"
               >
                 <Database className="h-4 w-4" />
                 <span>{busy ? "Importing..." : "Import Initial Data"}</span>
@@ -911,7 +917,7 @@ export function AdminDashboard({
         {notice && (
           <div
             role="status"
-            className={`mb-6 border-2 border-borderline p-3 font-mono text-xs font-bold ${
+            className={`mb-6 break-words border-2 border-borderline p-3 font-mono text-xs font-bold ${
               notice.type === "ok"
                 ? "bg-ink text-canvas"
                 : "bg-surface text-ink"
@@ -928,7 +934,7 @@ export function AdminDashboard({
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`shrink-0 border-2 border-borderline px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`min-h-[40px] shrink-0 border-2 border-borderline px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all sm:min-h-0 sm:px-4 ${
                 activeTab === tab.key
                   ? "bg-ink text-canvas shadow-brutal-sm"
                   : "bg-surface text-ink hover:bg-ink/5"
@@ -941,8 +947,8 @@ export function AdminDashboard({
 
         {/* TAB: PROFILE */}
         {activeTab === "profile" && (
-          <BrutalCard className="p-6">
-            <h2 className="mb-6 border-b-2 border-borderline pb-3 font-display text-xl font-bold">
+          <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
+            <h2 className="mb-5 border-b-2 border-borderline pb-3 font-display text-lg font-bold sm:mb-6 sm:text-xl">
               Profile, Availability &amp; CV Settings
             </h2>
             <form onSubmit={handleSaveProfile} className="space-y-4">
@@ -1209,9 +1215,9 @@ export function AdminDashboard({
               </div>
 
               {/* Featured GitHub Repositories Picker (Max 3) */}
-              <div className="border-2 border-borderline bg-canvas p-4">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <div>
+              <div className="border-2 border-borderline bg-canvas p-3.5 sm:p-4">
+                <div className="mb-3 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+                  <div className="min-w-0">
                     <label className={labelCls}>
                       Featured GitHub Repositories (
                       {(profile.featured_github_repos ?? []).length}/3 selected)
@@ -1228,7 +1234,7 @@ export function AdminDashboard({
                         onClick={() =>
                           setProfile({ ...profile, featured_github_repos: [] })
                         }
-                        className="font-mono text-xs uppercase text-muted hover:text-ink"
+                        className="min-h-[36px] font-mono text-xs uppercase text-muted hover:text-ink"
                       >
                         Reset to Auto Top 3
                       </button>
@@ -1239,6 +1245,7 @@ export function AdminDashboard({
                       size="sm"
                       disabled={loadingGithubRepos}
                       onClick={handleLoadGitHubRepos}
+                      className="w-full sm:w-auto"
                     >
                       <RefreshCw
                         className={`h-3.5 w-3.5 ${loadingGithubRepos ? "animate-spin" : ""}`}
@@ -1257,10 +1264,10 @@ export function AdminDashboard({
                         key={name}
                         type="button"
                         onClick={() => handleToggleFeaturedRepo(name)}
-                        className="inline-flex items-center gap-1.5 border-2 border-borderline bg-ink px-2.5 py-1 font-mono text-xs font-bold text-canvas"
+                        className="inline-flex max-w-full items-center gap-1.5 border-2 border-borderline bg-ink px-2.5 py-1.5 font-mono text-xs font-bold text-canvas"
                       >
                         <span>#{idx + 1}</span>
-                        <span>{name}</span>
+                        <span className="truncate">{name}</span>
                         <span>×</span>
                       </button>
                     ))}
@@ -1268,7 +1275,7 @@ export function AdminDashboard({
                 )}
 
                 {githubReposLoaded && githubRepos.length > 0 && (
-                  <div className="grid max-h-72 gap-2 overflow-y-auto pt-1 sm:grid-cols-2">
+                  <div className="grid max-h-72 grid-cols-1 gap-2 overflow-y-auto pt-1 sm:grid-cols-2">
                     {githubRepos.map((repo) => {
                       const selectedList = profile.featured_github_repos ?? [];
                       const selectedIdx = selectedList.findIndex(
@@ -1281,13 +1288,13 @@ export function AdminDashboard({
                           key={repo.id}
                           type="button"
                           onClick={() => handleToggleFeaturedRepo(repo.name)}
-                          className={`flex flex-col items-start gap-1 border-2 p-3 text-left transition-colors ${
+                          className={`flex min-w-0 flex-col items-start gap-1 border-2 p-3 text-left transition-colors ${
                             isSelected
                               ? "border-borderline bg-ink text-canvas"
                               : "border-borderline/40 bg-surface text-ink hover:border-borderline"
                           }`}
                         >
-                          <div className="flex w-full items-center justify-between gap-2 font-mono text-xs font-bold">
+                          <div className="flex w-full min-w-0 items-center justify-between gap-2 font-mono text-xs font-bold">
                             <span className="truncate">{repo.name}</span>
                             <span className="shrink-0 text-[10px] uppercase">
                               {isSelected
@@ -1297,7 +1304,7 @@ export function AdminDashboard({
                           </div>
                           {repo.description && (
                             <p
-                              className={`line-clamp-2 text-xs ${
+                              className={`line-clamp-2 break-words text-xs ${
                                 isSelected ? "text-canvas/80" : "text-muted"
                               }`}
                             >
@@ -1318,7 +1325,7 @@ export function AdminDashboard({
                 )}
               </div>
 
-              <BrutalButton type="submit" disabled={busy}>
+              <BrutalButton type="submit" disabled={busy} className="w-full sm:w-auto">
                 <Save className="h-4 w-4" />
                 <span>{busy ? "Saving..." : "Save Profile"}</span>
               </BrutalButton>
@@ -1328,22 +1335,27 @@ export function AdminDashboard({
 
         {/* TAB: PROJECTS */}
         {activeTab === "projects" && (
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="font-display text-xl font-bold">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+              <h2 className="font-display text-lg font-bold sm:text-xl">
                 Projects &amp; Case Studies
               </h2>
-              <div className="flex items-center gap-2">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
                 <BrutalButton
                   variant="secondary"
                   size="sm"
                   disabled={busy}
                   onClick={handleSeedInitialData}
+                  className="w-full sm:w-auto"
                 >
                   <Database className="h-4 w-4" />
                   <span>Sync Seed</span>
                 </BrutalButton>
-                <BrutalButton size="sm" onClick={startNewProject}>
+                <BrutalButton
+                  size="sm"
+                  onClick={startNewProject}
+                  className="w-full sm:w-auto"
+                >
                   <Plus className="h-4 w-4" />
                   <span>New Project</span>
                 </BrutalButton>
@@ -1351,7 +1363,7 @@ export function AdminDashboard({
             </div>
 
             {editingProjectId && (
-              <BrutalCard className="p-6">
+              <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
                 <form onSubmit={handleSaveProject} className="space-y-4">
                   <div className="flex items-center justify-between border-b-2 border-borderline pb-3">
                     <h3 className="font-display text-lg font-bold">
@@ -1672,13 +1684,13 @@ export function AdminDashboard({
                   </div>
 
                   {/* Project Thumbnail Upload & URL */}
-                  <div className="border-2 border-borderline bg-canvas p-4">
+                  <div className="border-2 border-borderline bg-canvas p-3.5 sm:p-4">
                     <label className={labelCls}>
                       Project Thumbnail (16:9 recommended — Upload or paste URL / /images/...)
                     </label>
-                    <div className="mt-2 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
                       {projectForm.cover_image_url && (
-                        <div className="aspect-[16/9] w-36 shrink-0 overflow-hidden border-2 border-borderline bg-surface">
+                        <div className="aspect-[16/9] w-full shrink-0 overflow-hidden border-2 border-borderline bg-surface sm:w-36">
                           <img
                             src={projectForm.cover_image_url}
                             alt="Thumbnail preview"
@@ -1686,7 +1698,7 @@ export function AdminDashboard({
                           />
                         </div>
                       )}
-                      <div className="flex-1 space-y-2">
+                      <div className="min-w-0 flex-1 space-y-2">
                         <input
                           className={inputCls}
                           placeholder="https://... or /images/project-thumb.png"
@@ -1698,8 +1710,8 @@ export function AdminDashboard({
                             })
                           }
                         />
-                        <div className="flex flex-wrap items-center gap-2">
-                          <label className="inline-flex cursor-pointer items-center gap-2 border-2 border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink hover:bg-ink hover:text-canvas">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <label className="inline-flex min-h-[40px] cursor-pointer items-center gap-2 border-2 border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink hover:bg-ink hover:text-canvas sm:min-h-0">
                             <ImagePlus className="h-3.5 w-3.5" />
                             <span>
                               {uploadingTarget === "project"
@@ -1728,7 +1740,7 @@ export function AdminDashboard({
                               type="button"
                               disabled={busy || uploadingTarget !== null}
                               onClick={handleRemoveProjectThumbnail}
-                              className="font-mono text-xs uppercase text-muted hover:text-ink disabled:opacity-50"
+                              className="min-h-[36px] font-mono text-xs uppercase text-muted hover:text-ink disabled:opacity-50"
                             >
                               {busy ? "Removing..." : "Remove Thumbnail"}
                             </button>
@@ -1739,9 +1751,9 @@ export function AdminDashboard({
                   </div>
 
                   {/* Documentation & Gallery Photos */}
-                  <div className="border-2 border-borderline bg-canvas p-4">
-                    <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                      <div>
+                  <div className="border-2 border-borderline bg-canvas p-3.5 sm:p-4">
+                    <div className="mb-3 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+                      <div className="min-w-0">
                         <label className={labelCls}>
                           Documentation &amp; Gallery Photos ({(projectForm.gallery_images ?? []).length})
                         </label>
@@ -1749,7 +1761,7 @@ export function AdminDashboard({
                           Screenshots, architecture diagrams, demo photos, etc. Shown in Case Study with click-to-zoom lightbox.
                         </p>
                       </div>
-                      <label className="inline-flex cursor-pointer items-center gap-2 border-2 border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink hover:bg-ink hover:text-canvas">
+                      <label className="inline-flex min-h-[40px] cursor-pointer items-center justify-center gap-2 border-2 border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink hover:bg-ink hover:text-canvas sm:min-h-0 sm:shrink-0">
                         <ImagePlus className="h-3.5 w-3.5" />
                         <span>
                           {uploadingTarget === "gallery"
@@ -1784,7 +1796,7 @@ export function AdminDashboard({
                         variant="secondary"
                         size="sm"
                         onClick={handleAddGalleryUrl}
-                        className="shrink-0"
+                        className="w-full shrink-0 sm:w-auto"
                       >
                         <Plus className="h-3.5 w-3.5" />
                         <span>Add URL</span>
@@ -1802,7 +1814,7 @@ export function AdminDashboard({
                             key={`${item.url}-${idx}`}
                             className="flex flex-col gap-3 border-2 border-borderline bg-surface p-3 sm:flex-row sm:items-start"
                           >
-                            <div className="aspect-[16/10] w-32 shrink-0 overflow-hidden border border-borderline bg-canvas">
+                            <div className="aspect-[16/10] w-full shrink-0 overflow-hidden border border-borderline bg-canvas sm:w-32">
                               <img
                                 src={item.url}
                                 alt={`Gallery ${idx + 1}`}
@@ -1810,7 +1822,7 @@ export function AdminDashboard({
                               />
                             </div>
 
-                            <div className="grid flex-1 gap-2 sm:grid-cols-2">
+                            <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-2">
                               <div>
                                 <label className={labelCls}>
                                   Caption EN (optional)
@@ -1847,15 +1859,15 @@ export function AdminDashboard({
                               </div>
                             </div>
 
-                            <div className="flex items-center gap-1 sm:flex-col">
+                            <div className="flex items-center justify-end gap-2 sm:flex-col sm:gap-1">
                               <button
                                 type="button"
                                 title="Move up"
                                 disabled={idx === 0}
                                 onClick={() => handleMoveGalleryItem(idx, -1)}
-                                className="inline-flex h-7 w-7 items-center justify-center border border-borderline bg-canvas text-ink disabled:opacity-30"
+                                className="inline-flex h-10 w-10 items-center justify-center border border-borderline bg-canvas text-ink disabled:opacity-30 sm:h-7 sm:w-7"
                               >
-                                <ArrowUp className="h-3.5 w-3.5" />
+                                <ArrowUp className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                               </button>
                               <button
                                 type="button"
@@ -1865,18 +1877,18 @@ export function AdminDashboard({
                                   (projectForm.gallery_images ?? []).length - 1
                                 }
                                 onClick={() => handleMoveGalleryItem(idx, 1)}
-                                className="inline-flex h-7 w-7 items-center justify-center border border-borderline bg-canvas text-ink disabled:opacity-30"
+                                className="inline-flex h-10 w-10 items-center justify-center border border-borderline bg-canvas text-ink disabled:opacity-30 sm:h-7 sm:w-7"
                               >
-                                <ArrowDown className="h-3.5 w-3.5" />
+                                <ArrowDown className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                               </button>
                               <button
                                 type="button"
                                 title="Remove photo"
                                 disabled={busy || uploadingTarget !== null}
                                 onClick={() => handleRemoveGalleryItem(idx)}
-                                className="inline-flex h-7 w-7 items-center justify-center border border-borderline bg-canvas text-ink hover:bg-ink hover:text-canvas disabled:opacity-30"
+                                className="inline-flex h-10 w-10 items-center justify-center border border-borderline bg-canvas text-ink hover:bg-ink hover:text-canvas disabled:opacity-30 sm:h-7 sm:w-7"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
                               </button>
                             </div>
                           </div>
@@ -1886,7 +1898,7 @@ export function AdminDashboard({
                   </div>
 
                   <div className="flex flex-wrap gap-6 font-mono text-xs font-bold uppercase">
-                    <label className="inline-flex items-center gap-2">
+                    <label className="inline-flex min-h-[36px] items-center gap-2">
                       <input
                         type="checkbox"
                         checked={projectForm.published}
@@ -1896,10 +1908,11 @@ export function AdminDashboard({
                             published: e.target.checked,
                           })
                         }
+                        className="h-4 w-4 accent-ink"
                       />
                       <span>Published</span>
                     </label>
-                    <label className="inline-flex items-center gap-2">
+                    <label className="inline-flex min-h-[36px] items-center gap-2">
                       <input
                         type="checkbox"
                         checked={projectForm.featured}
@@ -1909,12 +1922,13 @@ export function AdminDashboard({
                             featured: e.target.checked,
                           })
                         }
+                        className="h-4 w-4 accent-ink"
                       />
                       <span>Featured</span>
                     </label>
                   </div>
 
-                  <BrutalButton type="submit" disabled={busy}>
+                  <BrutalButton type="submit" disabled={busy} className="w-full sm:w-auto">
                     <Save className="h-4 w-4" />
                     <span>{busy ? "Saving..." : "Save Project"}</span>
                   </BrutalButton>
@@ -1922,33 +1936,36 @@ export function AdminDashboard({
               </BrutalCard>
             )}
 
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {projects.map((p) => (
                 <BrutalCard
                   key={p.id}
-                  className="flex flex-wrap items-center justify-between gap-4 p-5"
+                  className="flex w-full min-w-0 flex-col items-stretch justify-between gap-4 p-4 sm:flex-row sm:items-center sm:p-5"
                 >
-                  <div>
-                    <div className="mb-1 flex flex-wrap items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="mb-1.5 flex flex-wrap items-center gap-2">
                       <Badge variant={p.published ? "solid" : "outline"}>
                         {p.published ? "Published" : "Draft"}
                       </Badge>
                       <Badge variant="outline">{p.year}</Badge>
-                      <span className="font-mono text-xs text-muted">
+                      <span className="break-all font-mono text-xs text-muted">
                         /{p.slug}
                       </span>
                     </div>
-                    <h3 className="font-display text-lg font-bold">{p.title_en}</h3>
-                    <p className="font-mono text-xs text-muted">
+                    <h3 className="break-words font-display text-base font-bold sm:text-lg">
+                      {p.title_en}
+                    </h3>
+                    <p className="mt-0.5 break-words font-mono text-xs text-muted">
                       {p.tech_stack.join(" · ")}
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center justify-end gap-2 border-t border-borderline/20 pt-3 sm:border-t-0 sm:pt-0">
                     <BrutalButton
                       variant="secondary"
                       size="sm"
                       onClick={() => startEditProject(p)}
+                      className="flex-1 sm:flex-none"
                     >
                       Edit
                     </BrutalButton>
@@ -1968,19 +1985,23 @@ export function AdminDashboard({
 
         {/* TAB: CAPABILITIES */}
         {activeTab === "capabilities" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display text-lg font-bold sm:text-xl">
                 Tech Stack Quadrants
               </h2>
-              <BrutalButton size="sm" onClick={startNewCap}>
+              <BrutalButton
+                size="sm"
+                onClick={startNewCap}
+                className="w-full sm:w-auto"
+              >
                 <Plus className="h-4 w-4" />
                 <span>New Quadrant</span>
               </BrutalButton>
             </div>
 
             {editingCapId && (
-              <BrutalCard className="p-6">
+              <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
                 <form onSubmit={handleSaveCap} className="space-y-4">
                   <div className="flex items-center justify-between border-b-2 border-borderline pb-3">
                     <h3 className="font-display text-lg font-bold">
@@ -2088,7 +2109,7 @@ export function AdminDashboard({
                     </div>
                   </div>
 
-                  <BrutalButton type="submit" disabled={busy}>
+                  <BrutalButton type="submit" disabled={busy} className="w-full sm:w-auto">
                     <Save className="h-4 w-4" />
                     <span>Save Quadrant</span>
                   </BrutalButton>
@@ -2096,14 +2117,14 @@ export function AdminDashboard({
               </BrutalCard>
             )}
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {capabilities.map((cap) => (
-                <BrutalCard key={cap.id} className="p-5">
-                  <div className="mb-2 flex items-center justify-between">
-                    <h3 className="font-display text-lg font-bold">
+                <BrutalCard key={cap.id} className="w-full min-w-0 p-4 sm:p-5">
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="min-w-0 break-words font-display text-base font-bold sm:text-lg">
                       {cap.title_en}
                     </h3>
-                    <div className="flex gap-2">
+                    <div className="flex shrink-0 gap-2">
                       <BrutalButton
                         size="sm"
                         variant="secondary"
@@ -2120,7 +2141,7 @@ export function AdminDashboard({
                       </BrutalButton>
                     </div>
                   </div>
-                  <p className="font-mono text-xs text-muted">
+                  <p className="break-words font-mono text-xs text-muted">
                     {cap.items.join(" · ")}
                   </p>
                 </BrutalCard>
@@ -2131,19 +2152,23 @@ export function AdminDashboard({
 
         {/* TAB: EXPERIENCE */}
         {activeTab === "experience" && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="font-display text-lg font-bold sm:text-xl">
                 Experience &amp; Education
               </h2>
-              <BrutalButton size="sm" onClick={startNewExp}>
+              <BrutalButton
+                size="sm"
+                onClick={startNewExp}
+                className="w-full sm:w-auto"
+              >
                 <Plus className="h-4 w-4" />
                 <span>Add Entry</span>
               </BrutalButton>
             </div>
 
             {editingExpId && (
-              <BrutalCard className="p-6">
+              <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
                 <form onSubmit={handleSaveExp} className="space-y-4">
                   <div className="flex items-center justify-between border-b-2 border-borderline pb-3">
                     <h3 className="font-display text-lg font-bold">
@@ -2267,14 +2292,15 @@ export function AdminDashboard({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6">
-                    <label className="inline-flex items-center gap-2 font-mono text-xs font-bold uppercase">
+                  <div className="flex flex-wrap items-center gap-6">
+                    <label className="inline-flex min-h-[36px] items-center gap-2 font-mono text-xs font-bold uppercase">
                       <input
                         type="checkbox"
                         checked={expForm.published}
                         onChange={(e) =>
                           setExpForm({ ...expForm, published: e.target.checked })
                         }
+                        className="h-4 w-4 accent-ink"
                       />
                       <span>Published</span>
                     </label>
@@ -2284,7 +2310,7 @@ export function AdminDashboard({
                       </label>
                       <input
                         type="number"
-                        className="w-20 border-2 border-borderline bg-canvas px-2 py-1 text-sm"
+                        className="w-20 border-2 border-borderline bg-canvas px-2 py-1.5 text-base sm:text-sm"
                         value={expForm.sort_order}
                         onChange={(e) =>
                           setExpForm({
@@ -2296,7 +2322,7 @@ export function AdminDashboard({
                     </div>
                   </div>
 
-                  <BrutalButton type="submit" disabled={busy}>
+                  <BrutalButton type="submit" disabled={busy} className="w-full sm:w-auto">
                     <Save className="h-4 w-4" />
                     <span>Save Experience</span>
                   </BrutalButton>
@@ -2304,14 +2330,14 @@ export function AdminDashboard({
               </BrutalCard>
             )}
 
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 gap-4">
               {experiences.map((exp) => (
                 <BrutalCard
                   key={exp.id}
-                  className="flex flex-wrap items-center justify-between gap-4 p-5"
+                  className="flex w-full min-w-0 flex-col items-stretch justify-between gap-4 p-4 sm:flex-row sm:items-center sm:p-5"
                 >
-                  <div>
-                    <div className="mb-1 flex items-center gap-2">
+                  <div className="min-w-0">
+                    <div className="mb-1 flex flex-wrap items-center gap-2">
                       <Badge variant={exp.published ? "solid" : "outline"}>
                         {exp.published ? "Published" : "Hidden"}
                       </Badge>
@@ -2319,16 +2345,17 @@ export function AdminDashboard({
                         {exp.period}
                       </span>
                     </div>
-                    <h3 className="font-display text-lg font-bold">
+                    <h3 className="break-words font-display text-base font-bold sm:text-lg">
                       {exp.organization}
                     </h3>
-                    <p className="text-sm text-muted">{exp.role_en}</p>
+                    <p className="break-words text-sm text-muted">{exp.role_en}</p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex shrink-0 items-center justify-end gap-2 border-t border-borderline/20 pt-3 sm:border-t-0 sm:pt-0">
                     <BrutalButton
                       size="sm"
                       variant="secondary"
                       onClick={() => startEditExp(exp)}
+                      className="flex-1 sm:flex-none"
                     >
                       Edit
                     </BrutalButton>
@@ -2349,35 +2376,37 @@ export function AdminDashboard({
         {/* TAB: MESSAGES INBOX */}
         {activeTab === "messages" && (
           <div className="space-y-4">
-            <h2 className="font-display text-xl font-bold">Contact Inbox</h2>
+            <h2 className="font-display text-lg font-bold sm:text-xl">
+              Contact Inbox
+            </h2>
             {messages.length === 0 ? (
-              <BrutalCard className="p-8 text-center font-mono text-sm text-muted">
+              <BrutalCard className="w-full min-w-0 p-6 text-center font-mono text-sm text-muted sm:p-8">
                 No contact messages yet.
               </BrutalCard>
             ) : (
               messages.map((msg) => (
-                <BrutalCard key={msg.id} className="p-5">
-                  <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3">
-                    <div className="flex items-center gap-2">
+                <BrutalCard key={msg.id} className="w-full min-w-0 p-4 sm:p-5">
+                  <div className="mb-3 flex flex-col items-start justify-between gap-2 border-b-2 border-borderline pb-3 sm:flex-row sm:items-center">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
                       <Badge variant={msg.is_read ? "outline" : "solid"}>
                         {msg.is_read ? "Read" : "Unread"}
                       </Badge>
-                      <span className="font-display font-bold text-ink">
+                      <span className="break-words font-display font-bold text-ink">
                         {msg.subject}
                       </span>
                     </div>
-                    <span className="font-mono text-xs text-muted">
+                    <span className="shrink-0 font-mono text-[11px] text-muted sm:text-xs">
                       {new Date(msg.created_at).toLocaleString()}
                     </span>
                   </div>
 
-                  <p className="mb-2 flex items-center gap-2 font-mono text-xs text-muted">
-                    <Mail className="h-3.5 w-3.5" />
+                  <p className="mb-2 flex items-start gap-2 break-all font-mono text-xs text-muted">
+                    <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                     <span>
                       {msg.name} ({msg.email})
                     </span>
                   </p>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-ink">
+                  <p className="whitespace-pre-line break-words text-sm leading-relaxed text-ink">
                     {msg.message}
                   </p>
 
@@ -2386,6 +2415,7 @@ export function AdminDashboard({
                       size="sm"
                       variant="secondary"
                       onClick={() => handleToggleRead(msg)}
+                      className="flex-1 sm:flex-none"
                     >
                       <Check className="h-3.5 w-3.5" />
                       <span>{msg.is_read ? "Mark Unread" : "Mark Read"}</span>
@@ -2407,10 +2437,10 @@ export function AdminDashboard({
 
         {/* TAB: ANALYTICS */}
         {activeTab === "analytics" && (
-          <div className="space-y-6">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 className="font-display text-xl font-bold">
+          <div className="space-y-5 sm:space-y-6">
+            <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+              <div className="min-w-0">
+                <h2 className="font-display text-lg font-bold sm:text-xl">
                   Portfolio Analytics
                 </h2>
                 <p className="font-mono text-xs text-muted">
@@ -2423,6 +2453,7 @@ export function AdminDashboard({
                   size="sm"
                   disabled={busy}
                   onClick={handleRefreshAnalytics}
+                  className="flex-1 sm:flex-none"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   <span>Refresh</span>
@@ -2442,12 +2473,12 @@ export function AdminDashboard({
             </div>
 
             {!analytics.tableReady ? (
-              <BrutalCard className="p-6 font-mono text-xs">
+              <BrutalCard className="w-full min-w-0 p-4 font-mono text-xs sm:p-6">
                 <div className="flex items-center gap-2 font-bold uppercase text-ink">
                   <AlertTriangle className="h-4 w-4 shrink-0" />
                   <span>Analytics Table Setup Needed</span>
                 </div>
-                <p className="mt-2 leading-relaxed text-muted">
+                <p className="mt-2 break-words leading-relaxed text-muted">
                   Run the <code>analytics_events</code> section from{" "}
                   <code>supabase/schema.sql</code> in Supabase SQL Editor, then click
                   Refresh above to start recording page views, case study opens,
@@ -2456,8 +2487,8 @@ export function AdminDashboard({
               </BrutalCard>
             ) : (
               <>
-                {/* 4 KPI Cards */}
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {/* 4 KPI Cards (2x2 Grid on Mobile) */}
+                <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
                   {[
                     {
                       label: "TOTAL PAGE VIEWS",
@@ -2480,17 +2511,17 @@ export function AdminDashboard({
                       note: "Combined views (7d)",
                     },
                   ].map((kpi) => (
-                    <BrutalCard key={kpi.label} className="p-5">
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-muted">
+                    <BrutalCard key={kpi.label} className="w-full min-w-0 p-3.5 sm:p-5">
+                      <div className="mb-2 flex items-start justify-between gap-1">
+                        <span className="font-mono text-[10px] font-bold uppercase leading-tight tracking-wider text-muted sm:text-[11px]">
                           {kpi.label}
                         </span>
-                        <BarChart3 className="h-4 w-4 text-muted" />
+                        <BarChart3 className="h-3.5 w-3.5 shrink-0 text-muted sm:h-4 sm:w-4" />
                       </div>
-                      <p className="font-display text-3xl font-bold text-ink">
+                      <p className="font-display text-2xl font-bold text-ink sm:text-3xl">
                         {kpi.value}
                       </p>
-                      <p className="mt-1 font-mono text-[11px] text-muted">
+                      <p className="mt-1 font-mono text-[10px] leading-snug text-muted sm:text-[11px]">
                         {kpi.note}
                       </p>
                     </BrutalCard>
@@ -2498,12 +2529,12 @@ export function AdminDashboard({
                 </div>
 
                 {/* 14-Day Traffic Bar Chart */}
-                <BrutalCard className="p-6">
-                  <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3">
-                    <h3 className="font-display text-lg font-bold text-ink">
+                <BrutalCard className="w-full min-w-0 max-w-full p-4 sm:p-6">
+                  <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3 sm:mb-5">
+                    <h3 className="font-display text-base font-bold text-ink sm:text-lg">
                       14-Day Activity Trend
                     </h3>
-                    <div className="flex items-center gap-4 font-mono text-[11px] uppercase text-muted">
+                    <div className="flex items-center gap-3 font-mono text-[10px] uppercase text-muted sm:gap-4 sm:text-[11px]">
                       <span className="inline-flex items-center gap-1.5">
                         <span className="inline-block h-2.5 w-2.5 bg-ink" />
                         Views
@@ -2521,7 +2552,7 @@ export function AdminDashboard({
                       ...analytics.dailyTrend.map((d) => d.views + d.cvDownloads)
                     );
                     return (
-                      <div className="overflow-x-auto pb-1">
+                      <div className="w-full max-w-full overflow-x-auto pb-1">
                         <div className="grid min-w-[520px] grid-cols-[repeat(14,minmax(0,1fr))] gap-2">
                           {analytics.dailyTrend.map((day) => {
                             const total = day.views + day.cvDownloads;
@@ -2556,13 +2587,16 @@ export function AdminDashboard({
                       </div>
                     );
                   })()}
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-wider text-muted sm:hidden">
+                    ← Swipe chart →
+                  </p>
                 </BrutalCard>
 
                 {/* Breakdowns */}
-                <div className="grid gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">
                   {/* Top Viewed Projects */}
-                  <BrutalCard className="p-6">
-                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-lg font-bold">
+                  <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
+                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-base font-bold sm:text-lg">
                       Top Viewed Projects
                     </h3>
                     {analytics.topProjects.length === 0 ? (
@@ -2578,11 +2612,11 @@ export function AdminDashboard({
                           );
                           return analytics.topProjects.map((item) => (
                             <div key={item.slug} className="space-y-1">
-                              <div className="flex items-center justify-between font-mono text-xs">
-                                <span className="font-bold text-ink truncate pr-2">
+                              <div className="flex min-w-0 items-center justify-between gap-2 font-mono text-xs">
+                                <span className="truncate font-bold text-ink">
                                   {item.title}
                                 </span>
-                                <span className="text-muted shrink-0">
+                                <span className="shrink-0 text-muted">
                                   {item.views} views
                                 </span>
                               </div>
@@ -2602,8 +2636,8 @@ export function AdminDashboard({
                   </BrutalCard>
 
                   {/* Referrers & Devices */}
-                  <BrutalCard className="p-6">
-                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-lg font-bold">
+                  <BrutalCard className="w-full min-w-0 p-4 sm:p-6">
+                    <h3 className="mb-4 border-b-2 border-borderline pb-3 font-display text-base font-bold sm:text-lg">
                       Referrers &amp; Devices
                     </h3>
 
@@ -2617,12 +2651,12 @@ export function AdminDashboard({
                       ).map(([label, count]) => (
                         <div
                           key={label}
-                          className="border-2 border-borderline bg-canvas p-3 text-center"
+                          className="min-w-0 border-2 border-borderline bg-canvas p-2.5 text-center sm:p-3"
                         >
-                          <p className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                          <p className="truncate font-mono text-[10px] uppercase tracking-wider text-muted">
                             {label}
                           </p>
-                          <p className="mt-1 font-display text-xl font-bold text-ink">
+                          <p className="mt-1 font-display text-lg font-bold text-ink sm:text-xl">
                             {count}
                           </p>
                         </div>
@@ -2641,10 +2675,10 @@ export function AdminDashboard({
                         {analytics.topReferrers.map((ref) => (
                           <li
                             key={ref.host}
-                            className="flex items-center justify-between border-b border-borderline/20 pb-1"
+                            className="flex min-w-0 items-center justify-between gap-2 border-b border-borderline/20 pb-1"
                           >
-                            <span className="text-ink">{ref.host}</span>
-                            <span className="font-bold text-muted">
+                            <span className="truncate text-ink">{ref.host}</span>
+                            <span className="shrink-0 font-bold text-muted">
                               {ref.count}
                             </span>
                           </li>
