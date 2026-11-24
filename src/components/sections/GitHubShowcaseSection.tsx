@@ -50,7 +50,7 @@ export function GitHubShowcaseSection({
 }: {
   data: GitHubShowcaseData | null;
 }) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
 
   if (!data || data.repos.length === 0) {
     return null;
@@ -59,7 +59,7 @@ export function GitHubShowcaseSection({
   return (
     <section
       id="github"
-      className="scroll-mt-20 border-b-2 border-borderline bg-surface/40 py-16 sm:py-20"
+      className="scroll-mt-16 border-b-2 border-borderline bg-surface/40 py-12 sm:scroll-mt-20 sm:py-20"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
@@ -70,9 +70,9 @@ export function GitHubShowcaseSection({
         />
 
         {/* Monochrome GitHub Summary Bar */}
-        <BrutalCard className="mb-8 p-5 sm:p-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
+        <BrutalCard className="mb-6 p-4 sm:mb-8 sm:p-6">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
+            <div className="col-span-2 border-b border-borderline/20 pb-3 sm:col-span-1 sm:border-b-0 sm:pb-0">
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.handleLabel}
               </p>
@@ -80,7 +80,7 @@ export function GitHubShowcaseSection({
                 href={data.profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-flex items-center gap-1.5 font-display text-xl font-bold text-ink hover:underline"
+                className="mt-1 inline-flex items-center gap-1.5 font-display text-lg font-bold text-ink hover:underline sm:text-xl"
               >
                 <span>@{data.username}</span>
                 <ArrowUpRight className="h-4 w-4" />
@@ -105,7 +105,7 @@ export function GitHubShowcaseSection({
               </p>
             </div>
 
-            <div>
+            <div className="col-span-2 border-t border-borderline/20 pt-3 sm:col-span-1 sm:border-t-0 sm:pt-0">
               <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.languagesLabel}
               </p>
@@ -125,12 +125,12 @@ export function GitHubShowcaseSection({
 
         {/* Monochrome GitHub Contribution Calendar (requires GITHUB_TOKEN) */}
         {data.contributions && data.contributions.weeks.length > 0 && (
-          <BrutalCard className="mb-8 p-5 sm:p-6">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3">
+          <BrutalCard className="mb-6 p-4 sm:mb-8 sm:p-6">
+            <div className="mb-4 flex flex-col items-start justify-between gap-2 border-b-2 border-borderline pb-3 sm:flex-row sm:items-center">
               <h3 className="font-display text-base font-bold text-ink sm:text-lg">
                 {t.github.contributionsTitle}
               </h3>
-              <Badge variant="solid">
+              <Badge variant="solid" className="text-[11px] sm:text-xs">
                 {data.contributions.totalContributions.toLocaleString()}{" "}
                 {t.github.totalContributions}
               </Badge>
@@ -146,7 +146,7 @@ export function GitHubShowcaseSection({
                       {monthLabels.map((label, idx) => (
                         <div
                           key={idx}
-                          className="w-3 shrink-0 font-mono text-[9px] font-bold uppercase text-muted"
+                          className="w-2.5 shrink-0 font-mono text-[9px] font-bold uppercase text-muted sm:w-3"
                         >
                           {label ?? ""}
                         </div>
@@ -161,7 +161,7 @@ export function GitHubShowcaseSection({
                             <div
                               key={day.date}
                               title={`${day.date}: ${day.count} ${t.github.contributionUnit}`}
-                              className={`h-3 w-3 shrink-0 ${levelClasses[day.level]}`}
+                              className={`h-2.5 w-2.5 shrink-0 sm:h-3 sm:w-3 ${levelClasses[day.level]}`}
                             />
                           ))}
                         </div>
@@ -172,30 +172,35 @@ export function GitHubShowcaseSection({
               );
             })()}
 
-            <div className="mt-3 flex items-center justify-end gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted">
-              <span>{t.github.less}</span>
-              {([0, 1, 2, 3, 4] as const).map((lvl) => (
-                <span
-                  key={lvl}
-                  className={`inline-block h-3 w-3 ${levelClasses[lvl]}`}
-                />
-              ))}
-              <span>{t.github.more}</span>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-wider text-muted">
+              <span className="md:hidden">
+                {locale === "id" ? "← Geser kalender →" : "← Swipe calendar →"}
+              </span>
+              <div className="ml-auto flex items-center gap-1.5">
+                <span>{t.github.less}</span>
+                {([0, 1, 2, 3, 4] as const).map((lvl) => (
+                  <span
+                    key={lvl}
+                    className={`inline-block h-2.5 w-2.5 sm:h-3 sm:w-3 ${levelClasses[lvl]}`}
+                  />
+                ))}
+                <span>{t.github.more}</span>
+              </div>
             </div>
           </BrutalCard>
         )}
 
         {/* Repository Grid */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {data.repos.map((repo) => (
             <BrutalCard
               key={repo.id}
               interactive
-              className="flex h-full flex-col justify-between p-5"
+              className="flex h-full flex-col justify-between p-4 sm:p-5"
             >
               <div>
                 <div className="mb-3 flex items-center justify-between gap-2 border-b-2 border-borderline pb-2.5">
-                  <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold text-ink truncate">
+                  <span className="inline-flex min-w-0 items-center gap-1.5 font-mono text-xs font-bold text-ink">
                     <FolderGit2 className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{repo.name}</span>
                   </span>
@@ -211,7 +216,7 @@ export function GitHubShowcaseSection({
                 </p>
               </div>
 
-              <div className="mt-5 flex items-center justify-between border-t border-borderline/20 pt-3 font-mono text-xs">
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-borderline/20 pt-3 font-mono text-xs">
                 <div className="flex items-center gap-3 text-muted">
                   <span className="inline-flex items-center gap-1">
                     <Star className="h-3.5 w-3.5" />
@@ -257,8 +262,14 @@ export function GitHubShowcaseSection({
           ))}
         </div>
 
-        <div className="mt-8 flex justify-end">
-          <BrutalLinkButton href={data.profileUrl} external variant="secondary" size="md">
+        <div className="mt-6 flex justify-end sm:mt-8">
+          <BrutalLinkButton
+            href={data.profileUrl}
+            external
+            variant="secondary"
+            size="md"
+            className="w-full sm:w-auto"
+          >
             <span>{t.github.viewProfile}</span>
             <ArrowUpRight className="h-4 w-4" />
           </BrutalLinkButton>

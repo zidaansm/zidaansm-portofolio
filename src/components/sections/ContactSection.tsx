@@ -89,7 +89,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
   }
 
   return (
-    <section id="contact" className="scroll-mt-20 py-16 sm:py-20">
+    <section id="contact" className="scroll-mt-16 py-12 sm:scroll-mt-20 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           number={t.contact.sectionNumber}
@@ -98,11 +98,11 @@ export function ContactSection({ profile }: { profile: Profile }) {
           subtitle={t.contact.subtitle}
         />
 
-        <div className="grid gap-8 lg:grid-cols-12">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-12">
           {/* Left: Direct Channels */}
           <div className="lg:col-span-5">
-            <BrutalCard className="h-full p-6 sm:p-7">
-              <div className="mb-6 flex items-center justify-between border-b-2 border-borderline pb-3">
+            <BrutalCard className="h-full p-4 sm:p-7">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3 sm:mb-6">
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
                   {t.contact.directChannels}
                 </span>
@@ -111,15 +111,15 @@ export function ContactSection({ profile }: { profile: Profile }) {
                 )}
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-5 sm:space-y-6">
                 <div>
                   <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-muted">
                     {t.contact.emailLabel}
                   </p>
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-2 border-borderline bg-canvas p-3">
+                  <div className="flex flex-col items-start justify-between gap-3 border-2 border-borderline bg-canvas p-3 sm:flex-row sm:items-center">
                     <a
                       href={`mailto:${profile.email}`}
-                      className="inline-flex items-center gap-2 font-mono text-sm font-semibold text-ink break-all hover:underline"
+                      className="inline-flex items-center gap-2 break-all font-mono text-xs font-semibold text-ink hover:underline sm:text-sm"
                     >
                       <Mail className="h-4 w-4 shrink-0" />
                       <span>{profile.email}</span>
@@ -127,7 +127,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                     <button
                       type="button"
                       onClick={handleCopyEmail}
-                      className="inline-flex items-center gap-1.5 border border-borderline bg-surface px-2.5 py-1 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:bg-ink hover:text-canvas"
+                      className="inline-flex min-h-[38px] w-full items-center justify-center gap-1.5 border border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:bg-ink hover:text-canvas sm:min-h-0 sm:w-auto"
                     >
                       {copied ? (
                         <>
@@ -162,7 +162,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                       href={profile.linkedin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="brutal-interactive flex items-center justify-between bg-canvas px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-ink"
+                      className="brutal-interactive flex min-h-[44px] items-center justify-between bg-canvas px-3.5 py-3 font-mono text-xs font-bold uppercase tracking-wider text-ink sm:px-4"
                     >
                       <span>LinkedIn</span>
                       <ArrowUpRight className="h-4 w-4" />
@@ -171,7 +171,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                       href={profile.github_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="brutal-interactive flex items-center justify-between bg-canvas px-4 py-3 font-mono text-xs font-bold uppercase tracking-wider text-ink"
+                      className="brutal-interactive flex min-h-[44px] items-center justify-between bg-canvas px-3.5 py-3 font-mono text-xs font-bold uppercase tracking-wider text-ink sm:px-4"
                     >
                       <span>GitHub</span>
                       <ArrowUpRight className="h-4 w-4" />
@@ -184,8 +184,8 @@ export function ContactSection({ profile }: { profile: Profile }) {
 
           {/* Right: Contact Form */}
           <div className="lg:col-span-7">
-            <BrutalCard className="p-6 sm:p-7">
-              <div className="mb-6 border-b-2 border-borderline pb-3">
+            <BrutalCard className="p-4 sm:p-7">
+              <div className="mb-5 border-b-2 border-borderline pb-3 sm:mb-6">
                 <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink">
                   {t.contact.formTitle}
                 </span>
@@ -222,7 +222,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder={t.contact.namePlaceholder}
-                      className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink"
+                      className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink sm:text-sm"
                     />
                   </div>
 
@@ -240,7 +240,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={t.contact.emailPlaceholder}
-                      className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink"
+                      className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink sm:text-sm"
                     />
                   </div>
                 </div>
@@ -260,7 +260,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
                     placeholder={t.contact.subjectPlaceholder}
-                    className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink"
+                    className="w-full border-2 border-borderline bg-canvas px-3.5 py-2.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink sm:text-sm"
                   />
                 </div>
 
@@ -279,7 +279,7 @@ export function ContactSection({ profile }: { profile: Profile }) {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder={t.contact.messagePlaceholder}
-                    className="w-full resize-y border-2 border-borderline bg-canvas px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink"
+                    className="w-full resize-y border-2 border-borderline bg-canvas px-3.5 py-2.5 text-base text-ink placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-ink sm:text-sm"
                   />
                 </div>
 

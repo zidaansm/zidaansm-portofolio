@@ -37,7 +37,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
   }, [projects, activeFilter]);
 
   return (
-    <section id="projects" className="scroll-mt-20 border-b-2 border-borderline py-16 sm:py-20">
+    <section id="projects" className="scroll-mt-16 border-b-2 border-borderline py-12 sm:scroll-mt-20 sm:py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
           number={t.projects.sectionNumber}
@@ -46,16 +46,16 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
           subtitle={t.projects.subtitle}
         />
 
-        {/* Filter Bar */}
+        {/* Filter Bar (Horizontal Swipe Rail on Mobile, Wrapped on Desktop) */}
         <div
           role="group"
           aria-label="Filter projects by category or technology"
-          className="mb-8 flex flex-wrap items-center gap-2"
+          className="no-scrollbar -mx-4 mb-6 flex items-center gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mb-8 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0"
         >
           <button
             type="button"
             onClick={() => setActiveFilter("ALL")}
-            className={`border-2 border-borderline px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider transition-all ${
+            className={`shrink-0 border-2 border-borderline px-3 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all sm:py-1.5 ${
               activeFilter === "ALL"
                 ? "bg-ink text-canvas shadow-brutal-sm"
                 : "bg-surface text-ink hover:bg-ink/5"
@@ -69,7 +69,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
               key={category}
               type="button"
               onClick={() => setActiveFilter(category)}
-              className={`border-2 border-borderline px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`shrink-0 border-2 border-borderline px-3 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all sm:py-1.5 ${
                 activeFilter === category
                   ? "bg-ink text-canvas shadow-brutal-sm"
                   : "bg-surface text-ink hover:bg-ink/5"
@@ -84,7 +84,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
               key={stack}
               type="button"
               onClick={() => setActiveFilter(stack)}
-              className={`border border-borderline px-2.5 py-1.5 font-mono text-xs font-medium uppercase tracking-wider transition-all ${
+              className={`shrink-0 border border-borderline px-2.5 py-2 font-mono text-xs font-medium uppercase tracking-wider transition-all sm:py-1.5 ${
                 activeFilter === stack
                   ? "bg-ink text-canvas"
                   : "bg-canvas text-muted hover:text-ink"
@@ -97,11 +97,11 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
 
         {/* Projects Grid */}
         {filteredProjects.length === 0 ? (
-          <BrutalCard className="p-8 text-center font-mono text-sm text-muted">
+          <BrutalCard className="p-6 text-center font-mono text-sm text-muted sm:p-8">
             {t.projects.emptyState}
           </BrutalCard>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-5 sm:gap-6 md:grid-cols-2">
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((project, index) => {
                 const title =
@@ -123,7 +123,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
                   >
                     <BrutalCard
                       interactive
-                      className="group flex h-full flex-col justify-between p-6 sm:p-7"
+                      className="group flex h-full flex-col justify-between p-4 sm:p-7"
                     >
                       <div>
                         {/* Card Metadata Row */}
@@ -140,26 +140,26 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
                         {/* Project Thumbnail Frame */}
                         <Link
                           href={`/projects/${project.slug}`}
-                          className="mb-5 block overflow-hidden border-2 border-borderline bg-canvas"
+                          className="mb-4 block overflow-hidden border-2 border-borderline bg-canvas sm:mb-5"
                         >
                           {project.cover_image_url ? (
                             <div className="relative aspect-[16/9] w-full overflow-hidden">
                               <img
                                 src={project.cover_image_url}
                                 alt={title}
-                                className="h-full w-full object-cover grayscale transition-all duration-300 group-hover:scale-[1.03] group-hover:grayscale-0"
+                                className="h-full w-full object-cover transition-all duration-300 md:grayscale md:group-hover:scale-[1.03] md:group-hover:grayscale-0"
                               />
                             </div>
                           ) : (
-                            <div className="swiss-grid-bg flex aspect-[16/9] w-full flex-col justify-between p-4 transition-colors group-hover:bg-ink/[0.03]">
+                            <div className="swiss-grid-bg flex aspect-[16/9] w-full flex-col justify-between p-3.5 transition-colors group-hover:bg-ink/[0.03] sm:p-4">
                               <div className="flex items-center justify-between font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
                                 <span>CASE // {String(index + 1).padStart(2, "0")}</span>
                                 <span>{project.year}</span>
                               </div>
-                              <div className="font-display text-2xl font-bold tracking-tight text-ink/85 sm:text-3xl">
+                              <div className="break-words font-display text-lg font-bold tracking-tight text-ink/85 sm:text-3xl">
                                 {project.slug.replace(/-/g, " ").toUpperCase()}
                               </div>
-                              <div className="font-mono text-[10px] uppercase tracking-wider text-muted">
+                              <div className="truncate font-mono text-[10px] uppercase tracking-wider text-muted">
                                 {project.tech_stack.slice(0, 4).join(" · ")}
                               </div>
                             </div>
@@ -167,7 +167,7 @@ export function ProjectsSection({ projects }: { projects: Project[] }) {
                         </Link>
 
                         {/* Title & Role */}
-                        <h3 className="font-display text-2xl font-bold leading-snug tracking-tight text-ink">
+                        <h3 className="font-display text-xl font-bold leading-snug tracking-tight text-ink sm:text-2xl">
                           <Link
                             href={`/projects/${project.slug}`}
                             className="hover:underline underline-offset-4"

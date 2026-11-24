@@ -14,19 +14,19 @@ export function Footer({ profile }: { profile: Profile }) {
 
   return (
     <footer className="border-t-2 border-borderline bg-surface">
-      <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 px-4 py-8 sm:px-6 md:flex-row md:items-center lg:px-8">
+      <div className="mx-auto flex max-w-6xl flex-col justify-between gap-5 px-4 py-7 sm:px-6 sm:py-8 md:flex-row md:items-center lg:px-8">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-ink">
-            <span className="inline-block h-2 w-2 bg-ink" />
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-xs font-bold uppercase tracking-wider text-ink">
+            <span className="inline-block h-2 w-2 shrink-0 bg-ink" />
             <span>{profile.full_name}</span>
             <span className="text-muted">— {availability}</span>
           </div>
-          <p className="font-mono text-xs text-muted">
+          <p className="font-mono text-xs leading-relaxed text-muted">
             © {new Date().getFullYear()} {profile.full_name}. {t.footer.builtWith}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-5 font-mono text-xs font-semibold uppercase tracking-wider">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2.5 font-mono text-xs font-semibold uppercase tracking-wider">
           <a
             href={profile.github_url}
             target="_blank"

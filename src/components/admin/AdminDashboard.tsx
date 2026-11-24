@@ -53,7 +53,7 @@ interface AdminDashboardProps {
 }
 
 const inputCls =
-  "w-full border-2 border-borderline bg-canvas px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ink";
+  "w-full border-2 border-borderline bg-canvas px-3 py-2 text-base text-ink focus:outline-none focus:ring-2 focus:ring-ink sm:text-sm";
 const labelCls =
   "mb-1 block font-mono text-[11px] font-bold uppercase tracking-wider text-muted";
 
@@ -864,14 +864,14 @@ export function AdminDashboard({
           </div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="mb-8 flex flex-wrap gap-2">
+        {/* Tab Navigation (Scrollable Rail on Mobile) */}
+        <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mb-8 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
           {tabs.map((tab) => (
             <button
               key={tab.key}
               type="button"
               onClick={() => setActiveTab(tab.key)}
-              className={`border-2 border-borderline px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all ${
+              className={`shrink-0 border-2 border-borderline px-4 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all ${
                 activeTab === tab.key
                   ? "bg-ink text-canvas shadow-brutal-sm"
                   : "bg-surface text-ink hover:bg-ink/5"
@@ -2354,36 +2354,38 @@ export function AdminDashboard({
                       ...analytics.dailyTrend.map((d) => d.views + d.cvDownloads)
                     );
                     return (
-                      <div className="grid grid-cols-7 gap-2 sm:grid-cols-[repeat(14,minmax(0,1fr))]">
-                        {analytics.dailyTrend.map((day) => {
-                          const total = day.views + day.cvDownloads;
-                          const heightPct = Math.max(
-                            total > 0 ? 12 : 4,
-                            Math.round((total / maxDaily) * 100)
-                          );
-                          return (
-                            <div
-                              key={day.date}
-                              title={`${day.date}: ${day.views} views, ${day.cvDownloads} CV clicks`}
-                              className="flex flex-col items-center gap-1.5"
-                            >
-                              <span className="font-mono text-[10px] font-bold text-muted">
-                                {total > 0 ? total : "·"}
-                              </span>
-                              <div className="flex h-28 w-full items-end border border-borderline/30 bg-canvas p-1">
-                                <div
-                                  style={{ height: `${heightPct}%` }}
-                                  className={`w-full transition-all ${
-                                    total > 0 ? "bg-ink" : "bg-borderline/20"
-                                  }`}
-                                />
+                      <div className="overflow-x-auto pb-1">
+                        <div className="grid min-w-[520px] grid-cols-[repeat(14,minmax(0,1fr))] gap-2">
+                          {analytics.dailyTrend.map((day) => {
+                            const total = day.views + day.cvDownloads;
+                            const heightPct = Math.max(
+                              total > 0 ? 12 : 4,
+                              Math.round((total / maxDaily) * 100)
+                            );
+                            return (
+                              <div
+                                key={day.date}
+                                title={`${day.date}: ${day.views} views, ${day.cvDownloads} CV clicks`}
+                                className="flex flex-col items-center gap-1.5"
+                              >
+                                <span className="font-mono text-[10px] font-bold text-muted">
+                                  {total > 0 ? total : "·"}
+                                </span>
+                                <div className="flex h-28 w-full items-end border border-borderline/30 bg-canvas p-1">
+                                  <div
+                                    style={{ height: `${heightPct}%` }}
+                                    className={`w-full transition-all ${
+                                      total > 0 ? "bg-ink" : "bg-borderline/20"
+                                    }`}
+                                  />
+                                </div>
+                                <span className="font-mono text-[9px] text-muted">
+                                  {day.label}
+                                </span>
                               </div>
-                              <span className="font-mono text-[9px] text-muted">
-                                {day.label}
-                              </span>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
                     );
                   })()}

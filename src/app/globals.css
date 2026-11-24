@@ -40,8 +40,18 @@ body {
   background-color: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans), system-ui, sans-serif;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 ::selection {

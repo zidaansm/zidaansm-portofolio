@@ -21,7 +21,7 @@ export function ExperienceSection({
   return (
     <section
       id="experience"
-      className="scroll-mt-20 border-b-2 border-borderline py-16 sm:py-20"
+      className="scroll-mt-16 border-b-2 border-borderline py-12 sm:scroll-mt-20 sm:py-20"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <SectionHeader
@@ -31,7 +31,7 @@ export function ExperienceSection({
           subtitle={t.experience.subtitle}
         />
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-5 sm:gap-6 md:grid-cols-2">
           {experiences.map((exp) => {
             const role = locale === "id" ? exp.role_id : exp.role_en;
             const summary = locale === "id" ? exp.summary_id : exp.summary_en;
@@ -39,16 +39,18 @@ export function ExperienceSection({
               locale === "id" ? exp.highlights_id : exp.highlights_en;
 
             return (
-              <BrutalCard key={exp.id} className="p-6">
-                <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b-2 border-borderline pb-3">
-                  <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-ink">
+              <BrutalCard key={exp.id} className="p-4 sm:p-6">
+                <div className="mb-4 flex flex-col items-start justify-between gap-2 border-b-2 border-borderline pb-3 sm:flex-row sm:items-center">
+                  <div className="flex min-w-0 items-center gap-2 font-mono text-xs font-bold uppercase tracking-wider text-ink">
                     <Building2 className="h-4 w-4 shrink-0" />
-                    <span>{exp.organization}</span>
+                    <span className="leading-snug">{exp.organization}</span>
                   </div>
-                  <Badge variant="solid">{exp.period}</Badge>
+                  <Badge variant="solid" className="shrink-0">
+                    {exp.period}
+                  </Badge>
                 </div>
 
-                <h3 className="font-display text-xl font-bold text-ink">
+                <h3 className="font-display text-lg font-bold text-ink sm:text-xl">
                   {role}
                 </h3>
 

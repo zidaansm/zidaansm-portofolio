@@ -25,6 +25,15 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileOpen(false);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
   const navItems = [
     { href: "/#projects", label: t.nav.projects },
     { href: "/#capabilities", label: t.nav.capabilities },
@@ -38,16 +47,16 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-40 border-b-2 border-borderline bg-canvas/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-4 sm:h-16 sm:px-6 lg:px-8">
         {/* Brand Monogram */}
         <Link
           href="/"
-          className="inline-flex items-center gap-2 font-display text-lg font-bold tracking-tight text-ink transition-opacity hover:opacity-80"
+          className="inline-flex min-w-0 items-center gap-2 font-display text-base font-bold tracking-tight text-ink transition-opacity hover:opacity-80 sm:text-lg"
         >
-          <span className="inline-flex h-8 w-8 items-center justify-center border-2 border-borderline bg-ink font-mono text-sm font-bold text-canvas">
+          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center border-2 border-borderline bg-ink font-mono text-sm font-bold text-canvas">
             Z
           </span>
-          <span>{profile.brand_name}</span>
+          <span className="truncate">{profile.brand_name}</span>
         </Link>
 
         {/* Desktop Nav */}
@@ -67,7 +76,7 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
         </nav>
 
         {/* Controls */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
           {/* Bilingual Switcher */}
           <div
             role="group"
@@ -77,7 +86,7 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
             <button
               type="button"
               onClick={() => setLocale("en")}
-              className={`px-2 py-1 transition-colors ${
+              className={`min-h-[30px] px-2 py-1 transition-colors ${
                 locale === "en"
                   ? "bg-ink text-canvas"
                   : "text-muted hover:text-ink"
@@ -89,7 +98,7 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
             <button
               type="button"
               onClick={() => setLocale("id")}
-              className={`px-2 py-1 transition-colors ${
+              className={`min-h-[30px] px-2 py-1 transition-colors ${
                 locale === "id"
                   ? "bg-ink text-canvas"
                   : "text-muted hover:text-ink"
@@ -150,23 +159,24 @@ export function Navbar({ profile, hasExperiences = true }: NavbarProps) {
 
       {/* Mobile Navigation Drawer */}
       {mobileOpen && (
-        <div className="border-t-2 border-borderline bg-surface px-4 py-4 md:hidden">
-          <div className="flex flex-col gap-3">
+        <div className="border-t-2 border-borderline bg-surface px-4 pb-5 pt-3 shadow-brutal md:hidden">
+          <div className="flex flex-col gap-1">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileOpen(false)}
-                className="border-b border-borderline/20 py-2 font-mono text-sm font-semibold uppercase tracking-wider text-ink"
+                className="flex min-h-[44px] items-center justify-between border-b border-borderline/20 font-mono text-sm font-semibold uppercase tracking-wider text-ink active:bg-ink/5"
               >
-                {item.label}
+                <span>{item.label}</span>
+                <span className="text-xs text-muted">→</span>
               </Link>
             ))}
             <BrutalLinkButton
               href={profile.cv_url || "/cv"}
               external={isExternalUrl(profile.cv_url)}
               size="md"
-              className="mt-2 w-full"
+              className="mt-4 min-h-[44px] w-full"
               onClick={() => {
                 setMobileOpen(false);
                 trackPortfolioEvent({

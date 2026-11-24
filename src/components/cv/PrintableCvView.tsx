@@ -48,21 +48,21 @@ export function PrintableCvView({ data }: { data: PortfolioData }) {
         <p className="no-print mb-4 font-mono text-xs text-muted">{t.cv.note}</p>
 
         {/* Printable CV Sheet */}
-        <article className="print-container border-2 border-borderline bg-surface p-8 sm:p-10 shadow-brutal">
-          <header className="border-b-2 border-borderline pb-6">
-            <h1 className="font-display text-3xl font-bold tracking-tight text-ink">
+        <article className="print-container border-2 border-borderline bg-surface p-5 shadow-brutal sm:p-10">
+          <header className="border-b-2 border-borderline pb-5 sm:pb-6">
+            <h1 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
               {profile.full_name}
             </h1>
-            <p className="mt-1 font-mono text-sm font-semibold uppercase tracking-wider text-muted">
+            <p className="mt-1 font-mono text-xs font-semibold uppercase tracking-wider text-muted sm:text-sm">
               {role}
             </p>
-            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs text-ink">
+            <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5 break-all font-mono text-xs text-ink sm:gap-x-5">
               <span>{profile.location}</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>{profile.email}</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>{profile.github_url}</span>
-              <span>•</span>
+              <span className="hidden sm:inline">•</span>
               <span>{profile.linkedin_url}</span>
             </div>
           </header>
