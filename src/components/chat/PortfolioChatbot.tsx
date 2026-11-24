@@ -37,7 +37,7 @@ interface PortfolioChatbotProps {
 type EngineState = "idle" | "gemini" | "fallback";
 
 const INLINE_TOKEN_REGEX =
-  /(\*\*[^*]+\*\*|https?:\/\/[^\s)]+|(?:\/projects\/[a-z0-9-]+|\/#(?:projects|capabilities|experience|github|contact)|\/cv)\b|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g;
+  /(\*\*[^*]+\*\*|`?(?:https?:\/\/[^\s)`]+|(?:\/projects\/[a-z0-9-]+|\/#(?:projects|capabilities|experience|github|contact)|\/cv)\b|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})`?)/g;
 
 function formatInlineTokens(
   text: string,
@@ -45,8 +45,13 @@ function formatInlineTokens(
 ): ReactNode[] {
   const parts = text.split(INLINE_TOKEN_REGEX);
 
-  return parts.map((part, idx) => {
-    if (!part) return null;
+  return parts.map((rawPart, idx) => {
+    if (!rawPart) return null;
+
+    const part =
+      rawPart.startsWith("`") && rawPart.endsWith("`") && rawPart.length > 2
+        ? rawPart.slice(1, -1)
+        : rawPart;
 
     if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
       return (
