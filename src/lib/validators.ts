@@ -158,3 +158,27 @@ export const analyticsEventSchema = z.object({
   project_slug: z.string().trim().max(120).optional().nullable(),
   referrer: z.string().trim().max(500).optional().nullable(),
 });
+
+export const chatMessageSchema = z.object({
+  role: z.enum(["user", "assistant"]),
+  content: z
+    .string()
+    .trim()
+    .min(1, "Message cannot be empty")
+    .max(1500, "Message is too long"),
+});
+
+export const chatRequestSchema = z.object({
+  messages: z
+    .array(chatMessageSchema)
+    .min(1, "Please enter a question.")
+    .max(12, "Conversation history limit reached.")
+    .refine((msgs) => msgs[msgs.length - 1]?.role === "user", {
+      message: "Last message must be sent by the user.",
+    })
+    .refine((msgs) => (msgs[msgs.length - 1]?.content.length ?? 0) <= 600, {
+      message: "Question must be 600 characters or fewer.",
+    }),
+  locale: z.enum(["en", "id"]).optional().default("en"),
+  currentPage: z.string().trim().max(140).optional().nullable(),
+});

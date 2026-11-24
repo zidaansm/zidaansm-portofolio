@@ -1,4 +1,5 @@
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { PortfolioChatbot } from "@/components/chat/PortfolioChatbot";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { CapabilitiesSection } from "@/components/sections/CapabilitiesSection";
@@ -35,6 +36,10 @@ export default async function HomePage() {
         <ContactSection profile={data.profile} />
       </main>
       <Footer profile={data.profile} />
+      <PortfolioChatbot
+        currentPage="/"
+        isAiConfigured={Boolean(process.env.GEMINI_API_KEY?.trim())}
+      />
     </div>
   );
 }

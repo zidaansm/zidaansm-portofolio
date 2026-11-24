@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AnalyticsTracker } from "@/components/analytics/AnalyticsTracker";
+import { PortfolioChatbot } from "@/components/chat/PortfolioChatbot";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { ProjectCaseStudyView } from "@/components/projects/ProjectCaseStudyView";
@@ -55,6 +56,10 @@ export default async function ProjectDetailPage({
         />
       </div>
       <Footer profile={profile} />
+      <PortfolioChatbot
+        currentPage={`/projects/${project.slug}`}
+        isAiConfigured={Boolean(process.env.GEMINI_API_KEY?.trim())}
+      />
     </div>
   );
 }
