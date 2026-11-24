@@ -27,6 +27,7 @@ import type {
   AnalyticsSummary,
   ContactMessage,
   Experience,
+  GitHubRepo,
   Profile,
   Project,
   ProjectGalleryImage,
@@ -147,6 +148,9 @@ export function AdminDashboard({
   const [messages, setMessages] = useState<ContactMessage[]>(initialMessages);
   const [analytics, setAnalytics] =
     useState<AnalyticsSummary>(initialAnalytics);
+  const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
+  const [loadingGithubRepos, setLoadingGithubRepos] = useState(false);
+  const [githubReposLoaded, setGithubReposLoaded] = useState(false);
 
   // Project editor state
   const [editingProjectId, setEditingProjectId] = useState<string | "new" | null>(
@@ -443,6 +447,59 @@ export function AdminDashboard({
   }
 
   // ---------------- PROFILE ----------------
+  async function handleLoadGitHubRepos() {
+    setLoadingGithubRepos(true);
+    try {
+      const res = await fetch(
+        `/api/admin/github-repos?github_url=${encodeURIComponent(profile.github_url)}`
+      );
+      const json = (await res.json()) as { repos?: GitHubRepo[]; error?: string };
+      if (!res.ok) {
+        notify("err", json.error || "Failed to fetch GitHub repositories.");
+      } else {
+        setGithubRepos(json.repos ?? []);
+        setGithubReposLoaded(true);
+        if ((json.repos ?? []).length === 0) {
+          notify("err", "No public non-fork repositories found for that GitHub URL.");
+        }
+      }
+    } catch {
+      notify("err", "Network error loading GitHub repositories.");
+    } finally {
+      setLoadingGithubRepos(false);
+    }
+  }
+
+  function handleToggleFeaturedRepo(repoName: string) {
+    setProfile((prev) => {
+      const current = Array.isArray(prev.featured_github_repos)
+        ? prev.featured_github_repos
+        : [];
+      const exists = current.some(
+        (name) => name.toLowerCase() === repoName.toLowerCase()
+      );
+
+      if (exists) {
+        return {
+          ...prev,
+          featured_github_repos: current.filter(
+            (name) => name.toLowerCase() !== repoName.toLowerCase()
+          ),
+        };
+      }
+
+      if (current.length >= 3) {
+        notify("err", "Maximum 3 repositories can be pinned. Unselect one first.");
+        return prev;
+      }
+
+      return {
+        ...prev,
+        featured_github_repos: [...current, repoName],
+      };
+    });
+  }
+
   async function handleSaveProfile(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -1149,6 +1206,116 @@ export function AdminDashboard({
                     }
                   />
                 </div>
+              </div>
+
+              {/* Featured GitHub Repositories Picker (Max 3) */}
+              <div className="border-2 border-borderline bg-canvas p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <label className={labelCls}>
+                      Featured GitHub Repositories (
+                      {(profile.featured_github_repos ?? []).length}/3 selected)
+                    </label>
+                    <p className="font-mono text-[11px] text-muted">
+                      Leave empty to automatically display your top 3 best scored
+                      repositories, or pick up to 3 specific repos below.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {(profile.featured_github_repos ?? []).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setProfile({ ...profile, featured_github_repos: [] })
+                        }
+                        className="font-mono text-xs uppercase text-muted hover:text-ink"
+                      >
+                        Reset to Auto Top 3
+                      </button>
+                    )}
+                    <BrutalButton
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      disabled={loadingGithubRepos}
+                      onClick={handleLoadGitHubRepos}
+                    >
+                      <RefreshCw
+                        className={`h-3.5 w-3.5 ${loadingGithubRepos ? "animate-spin" : ""}`}
+                      />
+                      <span>
+                        {loadingGithubRepos ? "Loading..." : "Load GitHub Repos"}
+                      </span>
+                    </BrutalButton>
+                  </div>
+                </div>
+
+                {(profile.featured_github_repos ?? []).length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-1.5">
+                    {(profile.featured_github_repos ?? []).map((name, idx) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => handleToggleFeaturedRepo(name)}
+                        className="inline-flex items-center gap-1.5 border-2 border-borderline bg-ink px-2.5 py-1 font-mono text-xs font-bold text-canvas"
+                      >
+                        <span>#{idx + 1}</span>
+                        <span>{name}</span>
+                        <span>×</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {githubReposLoaded && githubRepos.length > 0 && (
+                  <div className="grid max-h-72 gap-2 overflow-y-auto pt-1 sm:grid-cols-2">
+                    {githubRepos.map((repo) => {
+                      const selectedList = profile.featured_github_repos ?? [];
+                      const selectedIdx = selectedList.findIndex(
+                        (n) => n.toLowerCase() === repo.name.toLowerCase()
+                      );
+                      const isSelected = selectedIdx !== -1;
+
+                      return (
+                        <button
+                          key={repo.id}
+                          type="button"
+                          onClick={() => handleToggleFeaturedRepo(repo.name)}
+                          className={`flex flex-col items-start gap-1 border-2 p-3 text-left transition-colors ${
+                            isSelected
+                              ? "border-borderline bg-ink text-canvas"
+                              : "border-borderline/40 bg-surface text-ink hover:border-borderline"
+                          }`}
+                        >
+                          <div className="flex w-full items-center justify-between gap-2 font-mono text-xs font-bold">
+                            <span className="truncate">{repo.name}</span>
+                            <span className="shrink-0 text-[10px] uppercase">
+                              {isSelected
+                                ? `#${selectedIdx + 1}`
+                                : repo.language || "Code"}
+                            </span>
+                          </div>
+                          {repo.description && (
+                            <p
+                              className={`line-clamp-2 text-xs ${
+                                isSelected ? "text-canvas/80" : "text-muted"
+                              }`}
+                            >
+                              {repo.description}
+                            </p>
+                          )}
+                          <span
+                            className={`font-mono text-[10px] ${
+                              isSelected ? "text-canvas/70" : "text-muted"
+                            }`}
+                          >
+                            ★ {repo.stars} · Updated {repo.pushedAt}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <BrutalButton type="submit" disabled={busy}>

@@ -41,7 +41,7 @@ export async function PUT(request: NextRequest) {
       .limit(1)
       .maybeSingle();
 
-    const result = existing
+    let result = existing
       ? await auth.supabase
           .from("profile")
           .update(parsed.data)
@@ -53,6 +53,38 @@ export async function PUT(request: NextRequest) {
           .insert(parsed.data)
           .select("*")
           .single();
+
+    // Backward-compatible retry if featured_github_repos column hasn't been added yet
+    if (
+      result.error &&
+      result.error.message.includes("featured_github_repos")
+    ) {
+      if (parsed.data.featured_github_repos.length > 0) {
+        return NextResponse.json(
+          {
+            error:
+              "Column 'featured_github_repos' is missing in Supabase. Run the ALTER TABLE SQL migration first to save pinned repositories.",
+          },
+          { status: 500 }
+        );
+      }
+
+      const { featured_github_repos: _ignored, ...fallbackPayload } = parsed.data;
+      void _ignored;
+
+      result = existing
+        ? await auth.supabase
+            .from("profile")
+            .update(fallbackPayload)
+            .eq("id", existing.id)
+            .select("*")
+            .single()
+        : await auth.supabase
+            .from("profile")
+            .insert(fallbackPayload)
+            .select("*")
+            .single();
+    }
 
     if (result.error) {
       return NextResponse.json({ error: result.error.message }, { status: 500 });

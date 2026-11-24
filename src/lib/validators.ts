@@ -54,6 +54,11 @@ export const profileSchema = z.object({
   linkedin_url: z.string().trim().url().max(300),
   cv_url: z.string().trim().min(1).max(500),
   avatar_url: nullableUrlSchema,
+  featured_github_repos: z
+    .array(z.string().trim().min(1).max(120))
+    .max(3)
+    .optional()
+    .default([]),
 });
 
 export const galleryImageSchema = z.object({

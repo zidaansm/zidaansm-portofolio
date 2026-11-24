@@ -39,6 +39,7 @@ create table if not exists public.profile (
   linkedin_url text not null,
   cv_url text not null default '/cv',
   avatar_url text,
+  featured_github_repos text[] not null default '{}',
   created_at timestamptz not null default timezone('utc'::text, now()),
   updated_at timestamptz not null default timezone('utc'::text, now())
 );
@@ -332,5 +333,7 @@ create policy "Admin can delete analytics events"
 
 grant insert on public.analytics_events to anon, authenticated;
 grant select, delete on public.analytics_events to authenticated;
+
+alter table public.profile add column if not exists featured_github_repos text[] not null default '{}';
 
 notify pgrst, 'reload schema';

@@ -70,9 +70,9 @@ export function GitHubShowcaseSection({
         />
 
         {/* Monochrome GitHub Summary Bar */}
-        <BrutalCard className="mb-6 p-4 sm:mb-8 sm:p-6">
+        <BrutalCard className="mb-6 w-full min-w-0 max-w-full p-4 sm:mb-8 sm:p-6">
           <div className="grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-            <div className="col-span-2 border-b border-borderline/20 pb-3 sm:col-span-1 sm:border-b-0 sm:pb-0">
+            <div className="col-span-2 min-w-0 border-b border-borderline/20 pb-3 sm:col-span-1 sm:border-b-0 sm:pb-0">
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.handleLabel}
               </p>
@@ -80,14 +80,14 @@ export function GitHubShowcaseSection({
                 href={data.profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-1 inline-flex items-center gap-1.5 font-display text-lg font-bold text-ink hover:underline sm:text-xl"
+                className="mt-1 inline-flex max-w-full items-center gap-1.5 font-display text-lg font-bold text-ink hover:underline sm:text-xl"
               >
-                <span>@{data.username}</span>
-                <ArrowUpRight className="h-4 w-4" />
+                <span className="truncate">@{data.username}</span>
+                <ArrowUpRight className="h-4 w-4 shrink-0" />
               </a>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.reposLabel}
               </p>
@@ -96,7 +96,7 @@ export function GitHubShowcaseSection({
               </p>
             </div>
 
-            <div>
+            <div className="min-w-0">
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.starsLabel}
               </p>
@@ -105,7 +105,7 @@ export function GitHubShowcaseSection({
               </p>
             </div>
 
-            <div className="col-span-2 border-t border-borderline/20 pt-3 sm:col-span-1 sm:border-t-0 sm:pt-0">
+            <div className="col-span-2 min-w-0 border-t border-borderline/20 pt-3 sm:col-span-1 sm:border-t-0 sm:pt-0">
               <p className="mb-1.5 font-mono text-[11px] uppercase tracking-wider text-muted">
                 {t.github.languagesLabel}
               </p>
@@ -125,7 +125,7 @@ export function GitHubShowcaseSection({
 
         {/* Monochrome GitHub Contribution Calendar (requires GITHUB_TOKEN) */}
         {data.contributions && data.contributions.weeks.length > 0 && (
-          <BrutalCard className="mb-6 p-4 sm:mb-8 sm:p-6">
+          <BrutalCard className="mb-6 w-full min-w-0 max-w-full p-4 sm:mb-8 sm:p-6">
             <div className="mb-4 flex flex-col items-start justify-between gap-2 border-b-2 border-borderline pb-3 sm:flex-row sm:items-center">
               <h3 className="font-display text-base font-bold text-ink sm:text-lg">
                 {t.github.contributionsTitle}
@@ -139,7 +139,7 @@ export function GitHubShowcaseSection({
             {(() => {
               const monthLabels = getMonthLabels(data.contributions.weeks);
               return (
-                <div className="overflow-x-auto pb-2">
+                <div className="w-full max-w-full overflow-x-auto pb-2">
                   <div className="inline-flex flex-col gap-1.5">
                     {/* Month Labels Row */}
                     <div className="flex gap-1">
@@ -190,40 +190,40 @@ export function GitHubShowcaseSection({
           </BrutalCard>
         )}
 
-        {/* Repository Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-          {data.repos.map((repo) => (
+        {/* Featured 3 Repositories Grid (strictly mobile-safe min-w-0) */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-5">
+          {data.repos.slice(0, 3).map((repo) => (
             <BrutalCard
               key={repo.id}
               interactive
-              className="flex h-full flex-col justify-between p-4 sm:p-5"
+              className="flex h-full w-full min-w-0 max-w-full flex-col justify-between p-4 sm:p-5"
             >
-              <div>
-                <div className="mb-3 flex items-center justify-between gap-2 border-b-2 border-borderline pb-2.5">
-                  <span className="inline-flex min-w-0 items-center gap-1.5 font-mono text-xs font-bold text-ink">
+              <div className="min-w-0">
+                <div className="mb-3 flex min-w-0 items-center justify-between gap-2 border-b-2 border-borderline pb-2.5">
+                  <span className="flex min-w-0 flex-1 items-center gap-1.5 font-mono text-xs font-bold text-ink">
                     <FolderGit2 className="h-3.5 w-3.5 shrink-0" />
                     <span className="truncate">{repo.name}</span>
                   </span>
                   {repo.language && (
-                    <Badge variant="outline" className="shrink-0 text-[10px]">
+                    <Badge variant="outline" className="shrink-0 px-2 py-0.5 text-[10px]">
                       {repo.language}
                     </Badge>
                   )}
                 </div>
 
-                <p className="text-sm leading-relaxed text-muted">
+                <p className="break-words text-sm leading-relaxed text-muted line-clamp-3">
                   {repo.description || t.github.noDescription}
                 </p>
               </div>
 
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-borderline/20 pt-3 font-mono text-xs">
-                <div className="flex items-center gap-3 text-muted">
+              <div className="mt-4 flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-borderline/20 pt-3 font-mono text-xs sm:mt-5">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted">
                   <span className="inline-flex items-center gap-1">
-                    <Star className="h-3.5 w-3.5" />
+                    <Star className="h-3.5 w-3.5 shrink-0" />
                     {repo.stars}
                   </span>
                   <span className="inline-flex items-center gap-1">
-                    <GitFork className="h-3.5 w-3.5" />
+                    <GitFork className="h-3.5 w-3.5 shrink-0" />
                     {repo.forks}
                   </span>
                   {repo.pushedAt && (
@@ -231,7 +231,7 @@ export function GitHubShowcaseSection({
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-2">
                   {repo.homepage && (
                     <a
                       href={
@@ -241,7 +241,7 @@ export function GitHubShowcaseSection({
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="border border-borderline bg-ink px-1.5 py-0.5 text-[10px] font-bold uppercase text-canvas"
+                      className="border border-borderline bg-ink px-2 py-1 text-[10px] font-bold uppercase text-canvas"
                     >
                       {t.github.liveBadge}
                     </a>
@@ -251,10 +251,10 @@ export function GitHubShowcaseSection({
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${repo.name} ${t.github.viewRepo}`}
-                    className="inline-flex items-center gap-0.5 font-bold uppercase text-ink hover:underline"
+                    className="inline-flex items-center gap-0.5 py-1 font-bold uppercase text-ink hover:underline"
                   >
                     <span>Code</span>
-                    <ArrowUpRight className="h-3.5 w-3.5" />
+                    <ArrowUpRight className="h-3.5 w-3.5 shrink-0" />
                   </a>
                 </div>
               </div>

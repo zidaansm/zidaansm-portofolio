@@ -20,6 +20,7 @@ export interface Profile {
   linkedin_url: string;
   cv_url: string;
   avatar_url: string | null;
+  featured_github_repos?: string[];
   updated_at?: string;
 }
 

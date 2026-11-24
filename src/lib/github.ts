@@ -158,8 +158,79 @@ export function extractGitHubUsername(githubUrl: string | null | undefined): str
   }
 }
 
-export async function getGitHubShowcase(
+function scoreRepository(repo: GitHubRepoResponse): number {
+  let score = 0;
+  score += (repo.stargazers_count ?? 0) * 4;
+  score += (repo.forks_count ?? 0) * 2;
+  if (repo.description && repo.description.trim().length > 0) score += 3;
+  if (repo.homepage && repo.homepage.trim().length > 0) score += 3;
+  if (repo.language) score += 1;
+
+  // Mild recency bonus (up to +3 for repos pushed within 180 days)
+  const pushedMs = Date.parse(repo.pushed_at || "");
+  if (!Number.isNaN(pushedMs)) {
+    const daysAgo = Math.max(0, (Date.now() - pushedMs) / (1000 * 60 * 60 * 24));
+    if (daysAgo <= 30) score += 3;
+    else if (daysAgo <= 90) score += 2;
+    else if (daysAgo <= 180) score += 1;
+  }
+
+  return score;
+}
+
+function mapRepo(repo: GitHubRepoResponse): GitHubRepo {
+  return {
+    id: repo.id,
+    name: repo.name,
+    description: repo.description,
+    htmlUrl: repo.html_url,
+    homepage:
+      repo.homepage && repo.homepage.trim().length > 0 ? repo.homepage : null,
+    language: repo.language,
+    stars: repo.stargazers_count ?? 0,
+    forks: repo.forks_count ?? 0,
+    pushedAt: repo.pushed_at ? repo.pushed_at.slice(0, 10) : "",
+  };
+}
+
+export async function getAllGitHubRepos(
   githubUrl: string | null | undefined
+): Promise<GitHubRepo[]> {
+  const username = extractGitHubUsername(githubUrl);
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github+json",
+    "User-Agent": "zidan-portfolio-showcase",
+  };
+  const token = process.env.GITHUB_TOKEN?.trim();
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  try {
+    const res = await fetch(
+      `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=pushed&direction=desc&per_page=30&type=owner`,
+      {
+        headers,
+        next: { revalidate: 300 },
+        signal: AbortSignal.timeout(5000),
+      }
+    );
+    if (!res.ok) return [];
+    const rawRepos = (await res.json()) as GitHubRepoResponse[];
+    if (!Array.isArray(rawRepos)) return [];
+
+    return rawRepos
+      .filter((repo) => !repo.fork && !repo.archived)
+      .sort((a, b) => scoreRepository(b) - scoreRepository(a))
+      .map(mapRepo);
+  } catch {
+    return [];
+  }
+}
+
+export async function getGitHubShowcase(
+  githubUrl: string | null | undefined,
+  featuredRepoNames?: string[] | null
 ): Promise<GitHubShowcaseData | null> {
   const username = extractGitHubUsername(githubUrl);
   const headers: Record<string, string> = {
@@ -180,7 +251,7 @@ export async function getGitHubShowcase(
         signal: AbortSignal.timeout(5000),
       }),
       fetch(
-        `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=pushed&direction=desc&per_page=15&type=owner`,
+        `https://api.github.com/users/${encodeURIComponent(username)}/repos?sort=pushed&direction=desc&per_page=30&type=owner`,
         {
           headers,
           next: { revalidate: 3600 },
@@ -221,17 +292,30 @@ export async function getGitHubShowcase(
       .slice(0, 5)
       .map(([name, count]) => ({ name, count }));
 
-    const repos: GitHubRepo[] = activeRepos.slice(0, 6).map((repo) => ({
-      id: repo.id,
-      name: repo.name,
-      description: repo.description,
-      htmlUrl: repo.html_url,
-      homepage: repo.homepage && repo.homepage.trim().length > 0 ? repo.homepage : null,
-      language: repo.language,
-      stars: repo.stargazers_count ?? 0,
-      forks: repo.forks_count ?? 0,
-      pushedAt: repo.pushed_at ? repo.pushed_at.slice(0, 10) : "",
-    }));
+    // Pick user-selected repos (up to 3) if configured, else top 3 best scored repos
+    const selectedNames = Array.isArray(featuredRepoNames)
+      ? featuredRepoNames.map((n) => n.trim().toLowerCase()).filter(Boolean)
+      : [];
+
+    let pickedRepos: GitHubRepoResponse[] = [];
+    if (selectedNames.length > 0) {
+      const byName = new Map(
+        activeRepos.map((repo) => [repo.name.toLowerCase(), repo])
+      );
+      for (const name of selectedNames) {
+        const match = byName.get(name);
+        if (match) pickedRepos.push(match);
+        if (pickedRepos.length >= 3) break;
+      }
+    }
+
+    if (pickedRepos.length === 0) {
+      pickedRepos = [...activeRepos]
+        .sort((a, b) => scoreRepository(b) - scoreRepository(a))
+        .slice(0, 3);
+    }
+
+    const repos: GitHubRepo[] = pickedRepos.map(mapRepo);
 
     return {
       username: userData.login || username,

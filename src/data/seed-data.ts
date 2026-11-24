@@ -30,6 +30,7 @@ export const FALLBACK_PROFILE: Profile = {
   linkedin_url: "https://www.linkedin.com/in/zidansm/",
   cv_url: "/cv",
   avatar_url: null,
+  featured_github_repos: [],
 };
 
 export const FALLBACK_PROJECTS: Project[] = [

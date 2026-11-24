@@ -14,7 +14,10 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const data = await getPortfolioData();
-  const githubData = await getGitHubShowcase(data.profile.github_url);
+  const githubData = await getGitHubShowcase(
+    data.profile.github_url,
+    data.profile.featured_github_repos
+  );
 
   return (
     <div className="flex min-h-screen flex-col">
