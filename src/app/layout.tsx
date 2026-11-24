@@ -29,8 +29,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Zidan Seftino Mutaqin — Fullstack Web Developer",
-    template: "%s | Zidan Seftino Mutaqin",
+    default: "Zidan's Portfolio",
+    template: "%s | Zidan's Portfolio",
   },
   description:
     "Personal portfolio of Zidan Seftino Mutaqin — Fullstack Web Developer & Information Systems graduate specializing in structured web systems (Laravel, Filament, Next.js), Android mobile development (Kotlin), and Power BI data reporting.",
@@ -47,14 +47,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: "Zidan Seftino Mutaqin — Fullstack Web Developer",
+    title: "Zidan's Portfolio",
     description:
       "Building structured web systems, mobile apps, and actionable data dashboards.",
-    siteName: "Zidan Seftino Mutaqin Portfolio",
+    siteName: "Zidan's Portfolio",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Zidan Seftino Mutaqin — Fullstack Web Developer",
+    title: "Zidan's Portfolio",
     description:
       "Building structured web systems, mobile apps, and actionable data dashboards.",
   },
