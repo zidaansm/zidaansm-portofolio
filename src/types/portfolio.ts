@@ -170,3 +170,45 @@ export interface GitHubShowcaseData {
   repos: GitHubRepo[];
   contributions: GitHubContributionCalendar | null;
 }
+
+export type ChatTopic =
+  | "projects"
+  | "tech_stack"
+  | "experience"
+  | "contact_cv"
+  | "profile"
+  | "salary_private"
+  | "other";
+
+export interface ChatLogRow {
+  id: string;
+  question: string;
+  reply_preview: string;
+  topic: string;
+  locale: Locale;
+  current_page: string;
+  response_mode: "gemini" | "fallback";
+  model_used: string;
+  response_ms: number;
+  created_at: string;
+}
+
+export interface ChatInsightsDailyPoint {
+  date: string;
+  label: string;
+  chats: number;
+}
+
+export interface ChatInsightsSummary {
+  tableReady: boolean;
+  totalChats: number;
+  chatsLast7Days: number;
+  aiSuccessRate: number;
+  avgResponseMs: number;
+  dailyTrend: ChatInsightsDailyPoint[];
+  topicBreakdown: { topic: string; label: string; count: number }[];
+  modelBreakdown: { model: string; count: number }[];
+  localeBreakdown: { id: number; en: number };
+  topPages: { page: string; count: number }[];
+  recentLogs: ChatLogRow[];
+}

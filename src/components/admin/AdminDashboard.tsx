@@ -19,12 +19,14 @@ import {
   Save,
   Trash2,
 } from "lucide-react";
+import { ChatInsightsTab } from "@/components/admin/ChatInsightsTab";
 import { Badge } from "@/components/ui/Badge";
 import { BrutalButton } from "@/components/ui/BrutalButton";
 import { BrutalCard } from "@/components/ui/BrutalCard";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import type {
   AnalyticsSummary,
+  ChatInsightsSummary,
   ContactMessage,
   Experience,
   GitHubRepo,
@@ -40,7 +42,8 @@ type TabKey =
   | "capabilities"
   | "experience"
   | "messages"
-  | "analytics";
+  | "analytics"
+  | "chat";
 
 interface AdminDashboardProps {
   initialProfile: Profile;
@@ -49,6 +52,7 @@ interface AdminDashboardProps {
   initialExperiences: Experience[];
   initialMessages: ContactMessage[];
   initialAnalytics: AnalyticsSummary;
+  initialChatInsights: ChatInsightsSummary;
   schemaReady: boolean;
   userEmail: string;
 }
@@ -123,6 +127,7 @@ export function AdminDashboard({
   initialExperiences,
   initialMessages,
   initialAnalytics,
+  initialChatInsights,
   schemaReady,
   userEmail,
 }: AdminDashboardProps) {
@@ -148,6 +153,8 @@ export function AdminDashboard({
   const [messages, setMessages] = useState<ContactMessage[]>(initialMessages);
   const [analytics, setAnalytics] =
     useState<AnalyticsSummary>(initialAnalytics);
+  const [chatInsights, setChatInsights] =
+    useState<ChatInsightsSummary>(initialChatInsights);
   const [githubRepos, setGithubRepos] = useState<GitHubRepo[]>([]);
   const [loadingGithubRepos, setLoadingGithubRepos] = useState(false);
   const [githubReposLoaded, setGithubReposLoaded] = useState(false);
@@ -825,6 +832,81 @@ export function AdminDashboard({
     }
   }
 
+  // ---------------- CHAT INSIGHTS ----------------
+  async function handleRefreshChatInsights() {
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/chat-insights");
+      const json = (await res.json()) as {
+        chatInsights?: ChatInsightsSummary;
+        error?: string;
+      };
+      if (!res.ok || !json.chatInsights) {
+        notify("err", json.error || "Failed to refresh chat insights.");
+      } else {
+        setChatInsights(json.chatInsights);
+        notify("ok", "Chat insights refreshed.");
+      }
+    } catch {
+      notify("err", "Network error refreshing chat insights.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleResetChatInsights() {
+    if (
+      !confirm(
+        "Delete all recorded chatbot questions? This cannot be undone."
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/admin/chat-insights", { method: "DELETE" });
+      const json = (await res.json()) as {
+        chatInsights?: ChatInsightsSummary;
+        error?: string;
+      };
+      if (!res.ok || !json.chatInsights) {
+        notify("err", json.error || "Failed to reset chat insights.");
+      } else {
+        setChatInsights(json.chatInsights);
+        notify("ok", "Chat insights cleared.");
+      }
+    } catch {
+      notify("err", "Network error resetting chat insights.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleDeleteChatLog(id: string) {
+    if (!confirm("Delete this logged chatbot question?")) return;
+    setBusy(true);
+    try {
+      const res = await fetch(
+        `/api/admin/chat-insights?id=${encodeURIComponent(id)}`,
+        { method: "DELETE" }
+      );
+      const json = (await res.json()) as {
+        chatInsights?: ChatInsightsSummary;
+        error?: string;
+      };
+      if (!res.ok || !json.chatInsights) {
+        notify("err", json.error || "Failed to delete chat log.");
+      } else {
+        setChatInsights(json.chatInsights);
+        notify("ok", "Chat log deleted.");
+      }
+    } catch {
+      notify("err", "Network error deleting chat log.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const tabs: { key: TabKey; label: string }[] = [
     { key: "projects", label: `Projects (${projects.length})` },
     { key: "profile", label: "Profile & CV" },
@@ -837,6 +919,10 @@ export function AdminDashboard({
     {
       key: "analytics",
       label: `Analytics (${analytics.totalPageViews + analytics.totalProjectViews})`,
+    },
+    {
+      key: "chat",
+      label: `Chat Insights (${chatInsights.totalChats})`,
     },
   ];
 
@@ -2690,6 +2776,17 @@ export function AdminDashboard({
               </>
             )}
           </div>
+        )}
+
+        {/* TAB: CHAT INSIGHTS */}
+        {activeTab === "chat" && (
+          <ChatInsightsTab
+            chatInsights={chatInsights}
+            busy={busy}
+            onRefresh={handleRefreshChatInsights}
+            onResetAll={handleResetChatInsights}
+            onDeleteOne={handleDeleteChatLog}
+          />
         )}
       </div>
     </div>

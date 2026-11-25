@@ -10,11 +10,17 @@ import {
   createEmptyAnalyticsSummary,
   summarizeAnalyticsEvents,
 } from "@/lib/analytics-server";
+import {
+  createEmptyChatInsightsSummary,
+  summarizeChatLogs,
+} from "@/lib/chat-insights-server";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type {
   AnalyticsEventRow,
   AnalyticsSummary,
+  ChatInsightsSummary,
+  ChatLogRow,
   ContactMessage,
   Experience,
   PortfolioData,
@@ -118,6 +124,7 @@ export async function getAdminPortfolioData(): Promise<{
   experiences: Experience[];
   messages: ContactMessage[];
   analytics: AnalyticsSummary;
+  chatInsights: ChatInsightsSummary;
   schemaReady: boolean;
 }> {
   const supabase = await createServerSupabaseClient();
@@ -129,6 +136,7 @@ export async function getAdminPortfolioData(): Promise<{
       experiences: FALLBACK_EXPERIENCES,
       messages: [],
       analytics: createEmptyAnalyticsSummary(false),
+      chatInsights: createEmptyChatInsightsSummary(false),
       schemaReady: false,
     };
   }
@@ -140,6 +148,7 @@ export async function getAdminPortfolioData(): Promise<{
     experiencesRes,
     messagesRes,
     analyticsRes,
+    chatLogsRes,
   ] = await Promise.all([
     supabase.from("profile").select("*").limit(1).maybeSingle(),
     supabase
@@ -164,6 +173,11 @@ export async function getAdminPortfolioData(): Promise<{
       .select("*")
       .order("created_at", { ascending: false })
       .limit(5000),
+    supabase
+      .from("chat_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(2000),
   ]);
 
   const schemaReady =
@@ -181,6 +195,12 @@ export async function getAdminPortfolioData(): Promise<{
         projects,
         true
       );
+  const chatInsights = chatLogsRes.error
+    ? createEmptyChatInsightsSummary(false)
+    : summarizeChatLogs(
+        (chatLogsRes.data as ChatLogRow[] | null) ?? [],
+        true
+      );
 
   return {
     profile: (profileRes.data as Profile | null) ?? FALLBACK_PROFILE,
@@ -189,6 +209,7 @@ export async function getAdminPortfolioData(): Promise<{
     experiences: (experiencesRes.data as Experience[] | null) ?? [],
     messages: (messagesRes.data as ContactMessage[] | null) ?? [],
     analytics,
+    chatInsights,
     schemaReady,
   };
 }

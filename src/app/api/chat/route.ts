@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import {
   BACKUP_GEMINI_MODELS,
   buildPortfolioSystemPrompt,
@@ -6,8 +7,11 @@ import {
   extractGeminiReplyText,
   generateFallbackReply,
 } from "@/lib/chat";
+import { classifyChatTopic } from "@/lib/chat-insights-server";
 import { getPortfolioData } from "@/lib/data/portfolio";
+import { getSupabaseConfig } from "@/lib/supabase/config";
 import { chatRequestSchema } from "@/lib/validators";
+import type { Locale } from "@/types/portfolio";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -80,6 +84,56 @@ function getCandidateModels(): string[] {
   return [...active, ...cooling];
 }
 
+function normalizeCurrentPage(page: string | null | undefined): string {
+  const trimmed = page?.trim() || "/";
+  if (!trimmed.startsWith("/")) return "/";
+  return trimmed.slice(0, 140);
+}
+
+/**
+ * Logs anonymous chatbot interactions after the response is sent (zero latency impact).
+ * Never stores IP addresses, cookies, or personal identifiers.
+ */
+function scheduleChatInsightLog(payload: {
+  question: string;
+  reply: string;
+  locale: Locale;
+  currentPage: string | null | undefined;
+  responseMode: "gemini" | "fallback";
+  modelUsed: string;
+  responseMs: number;
+}) {
+  const { url, anonKey, configured } = getSupabaseConfig();
+  if (!configured || !url || !anonKey) return;
+
+  const safePage = normalizeCurrentPage(payload.currentPage);
+  const topic = classifyChatTopic(payload.question, safePage);
+  const safeQuestion = payload.question.trim().slice(0, 600);
+  const safeReply = payload.reply.trim().slice(0, 780);
+  const safeMs = Math.max(0, Math.min(120000, Math.round(payload.responseMs)));
+
+  after(async () => {
+    try {
+      const supabase = createClient(url, anonKey, {
+        auth: { persistSession: false, autoRefreshToken: false },
+      });
+
+      await supabase.from("chat_logs").insert({
+        question: safeQuestion,
+        reply_preview: safeReply,
+        topic,
+        locale: payload.locale,
+        current_page: safePage,
+        response_mode: payload.responseMode,
+        model_used: payload.modelUsed.slice(0, 80),
+        response_ms: safeMs,
+      });
+    } catch {
+      // Non-blocking: never affect live chatbot responses if chat_logs table isn't created yet
+    }
+  });
+}
+
 async function callGeminiModel({
   apiKey,
   model,
@@ -128,6 +182,8 @@ async function callGeminiModel({
 }
 
 export async function POST(request: NextRequest) {
+  const requestStartedAt = Date.now();
+
   try {
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -223,6 +279,16 @@ export async function POST(request: NextRequest) {
             const payload: unknown = await response.json();
             const reply = extractGeminiReplyText(payload);
             if (reply) {
+              scheduleChatInsightLog({
+                question: lastUserMessage,
+                reply,
+                locale,
+                currentPage,
+                responseMode: "gemini",
+                modelUsed: model,
+                responseMs: Date.now() - requestStartedAt,
+              });
+
               return NextResponse.json({
                 ok: true,
                 reply,
@@ -265,6 +331,16 @@ export async function POST(request: NextRequest) {
       locale,
       currentPage
     );
+
+    scheduleChatInsightLog({
+      question: lastUserMessage,
+      reply: fallbackReply,
+      locale,
+      currentPage,
+      responseMode: "fallback",
+      modelUsed: "local-knowledge",
+      responseMs: Date.now() - requestStartedAt,
+    });
 
     return NextResponse.json({
       ok: true,

@@ -336,4 +336,49 @@ grant select, delete on public.analytics_events to authenticated;
 
 alter table public.profile add column if not exists featured_github_repos text[] not null default '{}';
 
+-- ============================================================================
+-- 7. Anonymous AI Chatbot Insights (Recruiter Question Logs)
+-- ============================================================================
+create table if not exists public.chat_logs (
+  id uuid primary key default gen_random_uuid(),
+  question text not null check (char_length(question) <= 600),
+  reply_preview text not null check (char_length(reply_preview) <= 800),
+  topic text not null default 'other',
+  locale text not null default 'en' check (locale in ('en', 'id')),
+  current_page text not null default '/',
+  response_mode text not null default 'gemini' check (response_mode in ('gemini', 'fallback')),
+  model_used text not null default 'gemini-4-hydrogen',
+  response_ms integer not null default 0,
+  created_at timestamptz not null default timezone('utc'::text, now())
+);
+
+create index if not exists idx_chat_logs_created
+  on public.chat_logs (created_at desc);
+
+create index if not exists idx_chat_logs_topic
+  on public.chat_logs (topic);
+
+alter table public.chat_logs enable row level security;
+
+drop policy if exists "Anyone can insert chat log" on public.chat_logs;
+create policy "Anyone can insert chat log"
+  on public.chat_logs for insert
+  with check (
+    response_mode in ('gemini', 'fallback')
+    and locale in ('en', 'id')
+  );
+
+drop policy if exists "Admin can read chat logs" on public.chat_logs;
+create policy "Admin can read chat logs"
+  on public.chat_logs for select
+  using (auth.jwt() ->> 'email' = 'zidanseftino18@gmail.com');
+
+drop policy if exists "Admin can delete chat logs" on public.chat_logs;
+create policy "Admin can delete chat logs"
+  on public.chat_logs for delete
+  using (auth.jwt() ->> 'email' = 'zidanseftino18@gmail.com');
+
+grant insert on public.chat_logs to anon, authenticated;
+grant select, delete on public.chat_logs to authenticated;
+
 notify pgrst, 'reload schema';
