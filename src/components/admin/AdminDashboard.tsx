@@ -1,24 +1,26 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   AlertTriangle,
   ArrowDown,
-  ArrowLeft,
   ArrowUp,
   BarChart3,
   Check,
   Database,
   ImagePlus,
-  LogOut,
   Mail,
   Plus,
   RefreshCw,
   Save,
   Trash2,
 } from "lucide-react";
+import { AdminOverviewTab } from "@/components/admin/AdminOverviewTab";
+import {
+  AdminSidebarShell,
+  type AdminTabKey,
+} from "@/components/admin/AdminSidebarShell";
 import { ChatInsightsTab } from "@/components/admin/ChatInsightsTab";
 import { Badge } from "@/components/ui/Badge";
 import { BrutalButton } from "@/components/ui/BrutalButton";
@@ -36,14 +38,7 @@ import type {
   TechCapability,
 } from "@/types/portfolio";
 
-type TabKey =
-  | "profile"
-  | "projects"
-  | "capabilities"
-  | "experience"
-  | "messages"
-  | "analytics"
-  | "chat";
+type TabKey = AdminTabKey;
 
 interface AdminDashboardProps {
   initialProfile: Profile;
@@ -132,7 +127,7 @@ export function AdminDashboard({
   userEmail,
 }: AdminDashboardProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<TabKey>("projects");
+  const [activeTab, setActiveTab] = useState<TabKey>("overview");
   const [notice, setNotice] = useState<{
     type: "ok" | "err";
     text: string;
@@ -907,57 +902,30 @@ export function AdminDashboard({
     }
   }
 
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: "projects", label: `Projects (${projects.length})` },
-    { key: "profile", label: "Profile & CV" },
-    { key: "capabilities", label: `Tech Matrix (${capabilities.length})` },
-    { key: "experience", label: `Experience (${experiences.length})` },
-    {
-      key: "messages",
-      label: unreadCount > 0 ? `Inbox (${unreadCount} new)` : `Inbox (${messages.length})`,
-    },
-    {
-      key: "analytics",
-      label: `Analytics (${analytics.totalPageViews + analytics.totalProjectViews})`,
-    },
-    {
-      key: "chat",
-      label: `Chat Insights (${chatInsights.totalChats})`,
-    },
-  ];
+  function handleQuickCreateProject() {
+    setActiveTab("projects");
+    startNewProject();
+  }
 
   return (
-    <div className="min-h-screen bg-canvas py-5 sm:py-8">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        {/* Top Bar */}
-        <div className="mb-6 flex flex-col items-start justify-between gap-4 border-b-2 border-borderline pb-5 sm:mb-8 sm:flex-row sm:items-center sm:pb-6">
-          <div className="min-w-0 w-full sm:w-auto">
-            <Link
-              href="/"
-              className="mb-2 inline-flex min-h-[36px] items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-muted hover:text-ink"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>View Live Portfolio</span>
-            </Link>
-            <h1 className="font-display text-2xl font-bold text-ink sm:text-3xl">
-              Portfolio Admin CMS
-            </h1>
-            <p className="mt-0.5 break-all font-mono text-xs text-muted">
-              Signed in as {userEmail}
-            </p>
-          </div>
-
-          <BrutalButton
-            variant="secondary"
-            size="sm"
-            onClick={handleSignOut}
-            className="w-full sm:w-auto shrink-0"
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Sign Out</span>
-          </BrutalButton>
-        </div>
-
+    <AdminSidebarShell
+      activeTab={activeTab}
+      onSelectTab={setActiveTab}
+      userEmail={userEmail}
+      brandName={profile.brand_name}
+      fullName={profile.full_name}
+      avatarUrl={profile.avatar_url}
+      counts={{
+        projects: projects.length,
+        capabilities: capabilities.length,
+        experiences: experiences.length,
+        messagesTotal: messages.length,
+        messagesUnread: unreadCount,
+        analyticsViews: analytics.totalPageViews + analytics.totalProjectViews,
+        chatTotal: chatInsights.totalChats,
+      }}
+      onSignOut={handleSignOut}
+    >
         {!schemaReady && (
           <BrutalCard className="mb-6 w-full min-w-0 border-2 p-4 font-mono text-xs">
             <div className="flex items-center gap-2 font-bold uppercase">
@@ -1013,23 +981,21 @@ export function AdminDashboard({
           </div>
         )}
 
-        {/* Tab Navigation (Scrollable Rail on Mobile) */}
-        <div className="no-scrollbar -mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:mb-8 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-          {tabs.map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveTab(tab.key)}
-              className={`min-h-[40px] shrink-0 border-2 border-borderline px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-wider transition-all sm:min-h-0 sm:px-4 ${
-                activeTab === tab.key
-                  ? "bg-ink text-canvas shadow-brutal-sm"
-                  : "bg-surface text-ink hover:bg-ink/5"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+        {/* TAB: OVERVIEW */}
+        {activeTab === "overview" && (
+          <AdminOverviewTab
+            profile={profile}
+            projects={projects}
+            capabilities={capabilities}
+            experiences={experiences}
+            messages={messages}
+            analytics={analytics}
+            chatInsights={chatInsights}
+            schemaReady={schemaReady}
+            onNavigate={setActiveTab}
+            onCreateNewProject={handleQuickCreateProject}
+          />
+        )}
 
         {/* TAB: PROFILE */}
         {activeTab === "profile" && (
@@ -2788,7 +2754,6 @@ export function AdminDashboard({
             onDeleteOne={handleDeleteChatLog}
           />
         )}
-      </div>
-    </div>
+    </AdminSidebarShell>
   );
 }
