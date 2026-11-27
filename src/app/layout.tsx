@@ -6,6 +6,7 @@ import { LanguageProvider } from "@/components/providers/LanguageProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { NavigationProgressBar } from "@/components/ui/NavigationProgressBar";
 import { LOCALE_COOKIE_NAME, parseLocale } from "@/lib/i18n";
+import { getSiteUrl } from "@/lib/utils";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -26,7 +27,53 @@ const jetBrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+const siteUrl = getSiteUrl();
+
+const personJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      name: "Zidan Seftino Mutaqin",
+      alternateName: "ZIDAN.",
+      url: siteUrl,
+      jobTitle: "Fullstack Web Developer",
+      email: "mailto:zidanseftino18@gmail.com",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "Bekasi",
+        addressRegion: "Jawa Barat",
+        addressCountry: "ID",
+      },
+      alumniOf: {
+        "@type": "CollegeOrUniversity",
+        name: "Universitas Bani Saleh",
+      },
+      sameAs: [
+        "https://github.com/zidaansm",
+        "https://www.linkedin.com/in/zidansm/",
+      ],
+      knowsAbout: [
+        "Fullstack Web Development",
+        "Next.js",
+        "TypeScript",
+        "Laravel",
+        "Filament",
+        "PostgreSQL",
+        "MySQL",
+        "Kotlin",
+        "Android Development",
+        "Power BI",
+      ],
+    },
+    {
+      "@type": "WebSite",
+      name: "Zidan's Portfolio",
+      url: siteUrl,
+      inLanguage: ["en", "id"],
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -80,6 +127,10 @@ export default async function RootLayout({
         suppressHydrationWarning
         className="min-h-screen bg-canvas text-ink antialiased"
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
+        />
         <ThemeProvider>
           <LanguageProvider initialLocale={initialLocale}>
             <Suspense fallback={null}>

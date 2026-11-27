@@ -9,6 +9,8 @@ import {
   BarChart3,
   Check,
   Database,
+  ExternalLink,
+  FileUp,
   ImagePlus,
   Mail,
   Plus,
@@ -134,7 +136,7 @@ export function AdminDashboard({
   } | null>(null);
   const [busy, setBusy] = useState(false);
   const [uploadingTarget, setUploadingTarget] = useState<
-    "avatar" | "project" | "gallery" | null
+    "avatar" | "project" | "gallery" | "cv" | null
   >(null);
   const [galleryUrlDraft, setGalleryUrlDraft] = useState("");
 
@@ -258,6 +260,85 @@ export function AdminDashboard({
       }
     } catch {
       notify("err", "Network error while removing profile photo.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleCvPdfUpload(file: File | undefined) {
+    if (!file) return;
+    const previousCvUrl = profile.cv_url;
+    setUploadingTarget("cv");
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "cv");
+
+      const uploadRes = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const uploadJson = (await uploadRes.json()) as {
+        url?: string;
+        error?: string;
+      };
+      if (!uploadRes.ok || !uploadJson.url) {
+        notify("err", uploadJson.error || "CV PDF upload failed.");
+        return;
+      }
+
+      // Immediately persist the new PDF CV link to profile
+      const updatedPayload: Profile = { ...profile, cv_url: uploadJson.url };
+      const saveRes = await fetch("/api/admin/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedPayload),
+      });
+      const saveJson = (await saveRes.json()) as {
+        profile?: Profile;
+        error?: string;
+      };
+      if (!saveRes.ok || !saveJson.profile) {
+        setProfile((prev) => ({ ...prev, cv_url: uploadJson.url! }));
+        notify(
+          "err",
+          saveJson.error || "CV uploaded, but click Save Profile to publish."
+        );
+        return;
+      }
+
+      await deleteStorageImage(previousCvUrl);
+      setProfile(saveJson.profile);
+      router.refresh();
+      notify("ok", "CV PDF uploaded and published live!");
+    } catch {
+      notify("err", "Network error while uploading CV PDF.");
+    } finally {
+      setUploadingTarget(null);
+    }
+  }
+
+  async function handleResetCvToPrintable() {
+    const previousCvUrl = profile.cv_url;
+    setBusy(true);
+    try {
+      const updatedPayload: Profile = { ...profile, cv_url: "/cv" };
+      const res = await fetch("/api/admin/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedPayload),
+      });
+      const json = (await res.json()) as { profile?: Profile; error?: string };
+      if (!res.ok || !json.profile) {
+        notify("err", json.error || "Failed to reset CV link.");
+      } else {
+        await deleteStorageImage(previousCvUrl);
+        setProfile(json.profile);
+        router.refresh();
+        notify("ok", "CV reset to built-in printable /cv page.");
+      }
+    } catch {
+      notify("err", "Network error resetting CV link.");
     } finally {
       setBusy(false);
     }
@@ -1004,7 +1085,7 @@ export function AdminDashboard({
               Profile, Availability &amp; CV Settings
             </h2>
             <form onSubmit={handleSaveProfile} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className={labelCls}>Full Name</label>
                   <input
@@ -1027,16 +1108,90 @@ export function AdminDashboard({
                     }
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className={labelCls}>CV Link (/cv or /cv.pdf or URL)</label>
+                  <label className={labelCls}>Location</label>
                   <input
                     className={inputCls}
                     required
+                    value={profile.location}
+                    onChange={(e) =>
+                      setProfile({ ...profile, location: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label className={labelCls}>Timezone</label>
+                  <input
+                    className={inputCls}
+                    required
+                    value={profile.timezone}
+                    onChange={(e) =>
+                      setProfile({ ...profile, timezone: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* CV PDF Upload & URL */}
+              <div className="border-2 border-borderline bg-canvas p-4">
+                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                  <label className={labelCls}>
+                    CV / Resume PDF (Upload PDF to Storage or use /cv printable page)
+                  </label>
+                  <a
+                    href={profile.cv_url || "/cv"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 font-mono text-[11px] font-bold uppercase tracking-wider text-ink underline underline-offset-2 hover:opacity-75"
+                  >
+                    <span>Open Current CV</span>
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+                <div className="space-y-2.5">
+                  <input
+                    className={inputCls}
+                    required
+                    placeholder="/cv or https://.../cv.pdf"
                     value={profile.cv_url}
                     onChange={(e) =>
                       setProfile({ ...profile, cv_url: e.target.value })
                     }
                   />
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <label className="inline-flex min-h-[38px] cursor-pointer items-center gap-2 border-2 border-borderline bg-surface px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink transition-colors hover:bg-ink hover:text-canvas">
+                      <FileUp className="h-3.5 w-3.5" />
+                      <span>
+                        {uploadingTarget === "cv"
+                          ? "Uploading PDF..."
+                          : "Upload CV PDF (Max 10MB)"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="application/pdf,.pdf"
+                        className="hidden"
+                        disabled={uploadingTarget !== null || busy}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          e.target.value = "";
+                          void handleCvPdfUpload(file);
+                        }}
+                      />
+                    </label>
+                    {profile.cv_url !== "/cv" && (
+                      <button
+                        type="button"
+                        disabled={busy || uploadingTarget !== null}
+                        onClick={() => void handleResetCvToPrintable()}
+                        className="font-mono text-xs uppercase text-muted hover:text-ink disabled:opacity-50"
+                      >
+                        Reset to Printable /cv
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
 

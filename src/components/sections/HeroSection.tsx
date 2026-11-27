@@ -135,8 +135,11 @@ export function HeroSection({ profile }: { profile: Profile }) {
           <div className="lg:col-span-4">
             <BrutalCard className="p-4 sm:p-6">
               <div className="mb-4 flex items-center justify-between border-b-2 border-borderline pb-3">
-                <span className="font-mono text-xs font-bold uppercase tracking-widest text-ink">
-                  SPEC SHEET // 2026
+                <span
+                  suppressHydrationWarning
+                  className="font-mono text-xs font-bold uppercase tracking-widest text-ink"
+                >
+                  SPEC SHEET // {new Date().getFullYear()}
                 </span>
                 <span className="font-mono text-xs text-muted">ID-01</span>
               </div>

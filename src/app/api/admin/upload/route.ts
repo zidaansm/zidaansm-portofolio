@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/supabase/admin-auth";
 
-const ALLOWED_TYPES = new Set([
+const ALLOWED_IMAGE_TYPES = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/avif",
 ]);
-const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const ALLOWED_CV_TYPES = new Set(["application/pdf"]);
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_PDF_BYTES = 10 * 1024 * 1024; // 10MB
 const BUCKET_NAME = "portfolio-media";
 
 export async function POST(request: NextRequest) {
@@ -18,37 +20,55 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData();
     const file = formData.get("file");
     const folderRaw = String(formData.get("folder") || "general");
-    const folder = ["profile", "projects"].includes(folderRaw)
+    const folder = ["profile", "projects", "cv"].includes(folderRaw)
       ? folderRaw
       : "general";
 
     if (!(file instanceof File)) {
       return NextResponse.json(
-        { error: "No image file provided." },
+        { error: "No file provided." },
         { status: 400 }
       );
     }
 
-    if (!ALLOWED_TYPES.has(file.type)) {
+    const isCvUpload = folder === "cv";
+    const allowedTypes = isCvUpload ? ALLOWED_CV_TYPES : ALLOWED_IMAGE_TYPES;
+    const maxBytes = isCvUpload ? MAX_PDF_BYTES : MAX_IMAGE_BYTES;
+
+    if (!allowedTypes.has(file.type)) {
       return NextResponse.json(
-        { error: "Unsupported format. Use JPG, PNG, WebP, or AVIF." },
+        {
+          error: isCvUpload
+            ? "Unsupported format. Please upload a PDF file (.pdf)."
+            : "Unsupported format. Use JPG, PNG, WebP, or AVIF.",
+        },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_SIZE_BYTES) {
+    if (file.size > maxBytes) {
       return NextResponse.json(
-        { error: "Image is too large. Maximum size is 5MB." },
+        {
+          error: isCvUpload
+            ? "PDF file is too large. Maximum size is 10MB."
+            : "Image is too large. Maximum size is 5MB.",
+        },
         { status: 400 }
       );
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-    const safeBase = file.name
-      .replace(/\.[^/.]+$/, "")
-      .toLowerCase()
-      .replace(/[^a-z0-9-_]/g, "-")
-      .slice(0, 40) || "image";
+    const defaultExt = isCvUpload ? "pdf" : "jpg";
+    const ext =
+      (isCvUpload
+        ? "pdf"
+        : file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "")) ||
+      defaultExt;
+    const safeBase =
+      file.name
+        .replace(/\.[^/.]+$/, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9-_]/g, "-")
+        .slice(0, 40) || (isCvUpload ? "cv" : "image");
     const filePath = `${folder}/${Date.now()}-${safeBase}.${ext}`;
 
     const arrayBuffer = await file.arrayBuffer();
@@ -75,7 +95,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: publicData.publicUrl });
   } catch {
     return NextResponse.json(
-      { error: "Failed to process image upload." },
+      { error: "Failed to process file upload." },
       { status: 500 }
     );
   }
